@@ -26,6 +26,7 @@ NOTE_END //n"""
 import json
 
 from dNG.pas.net.server.handler import direct_handler
+from dNG.pas.net.server.shutdown_exception import direct_shutdown_exception
 from dNG.pas.plugins.hooks import direct_hooks
 from dNG.pas.pythonback import *
 
@@ -123,10 +124,11 @@ Active conversation
 				#
 				elif (self.log_handler != None): self.log_handler.debug("pas.bus got nothing to return")
 
-				if (data['method'] == "dNG.pas.status.shutdown"):
+				if (data['method'] == "dNG.pas.status.stop"):
 				#
-					if (self.log_handler != None): self.log_handler.info("pas.bus received shutdown request")
+					if (self.log_handler != None): self.log_handler.info("pas.bus received stop (shutdown) request")
 					message = ""
+					self.server.stop()
 				#
 				elif (result == None or self.write_message(result)): message = self.get_message()
 				else: message = ""

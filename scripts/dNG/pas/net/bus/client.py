@@ -234,7 +234,7 @@ Requests the IPC aware application to call the given hook.
 
 		data = json.dumps({ "jsonrpc": "2.0", "method": hook, "params": args, "id": 1 })
 
-		if (self.write_message(data) and hook != "dNG.pas.status.shutdown"):
+		if (self.write_message(data) and hook != "dNG.pas.status.stop"):
 		#
 			data = self.get_message()
 
