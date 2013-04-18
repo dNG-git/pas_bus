@@ -10,7 +10,7 @@ direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
 (C) direct Netware Group - All rights reserved
-http://www.direct-netware.de/redirect.py?pas;http;core
+http://www.direct-netware.de/redirect.py?pas;bus
 
 This Source Code Form is subject to the terms of the Mozilla Public License,
 v. 2.0. If a copy of the MPL was not distributed with this file, You can
@@ -40,7 +40,7 @@ Client for the "direct_server" infrastructure.
 :package:    pas
 :subpackage: bus
 :since:      v0.1.00
-:license:    http://www.direct-netware.de/redirect?licenses;mpl2
+:license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
 

@@ -12,7 +12,7 @@ obtain one at http://mozilla.org/MPL/2.0/.
 
 http://www.direct-netware.de/redirect.py?licenses;mpl2
 // -->
-<project name="PAS_bus" default="compile.pyBuilder">
+<project name="pas_bus" default="compile.pyBuilder">
 	<dirname property="pas.basedir" file="${ant.file}" />
 	<property file="${pas.basedir}/_extras/build.properties" />
 

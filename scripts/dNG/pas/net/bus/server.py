@@ -39,7 +39,7 @@ class direct_server(direct_dispatcher):
 :package:    pas
 :subpackage: bus
 :since:      v0.1.00
-:license:    http://www.direct-netware.de/redirect?licenses;mpl2
+:license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
 
