@@ -70,8 +70,6 @@ Socket instance
 Request timeout value
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -client.__init__()- (#echo(__LINE__)#)")
-
 		listener_address = direct_settings.get("{0}_listener_address".format(app_config_prefix))
 		listener_mode = direct_settings.get("{0}_listener_mode".format(app_config_prefix))
 

@@ -54,7 +54,6 @@ Constructor __init__(direct_request)
 		"""
 
 		direct_handler.__init__(self)
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -request.__init__()- (#echo(__LINE__)#)")
 	#
 
 	def get_message(self):
