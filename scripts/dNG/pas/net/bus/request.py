@@ -25,10 +25,9 @@ NOTE_END //n"""
 
 import json
 
+from dNG.pas.data.binary import direct_binary
 from dNG.pas.net.server.handler import direct_handler
-from dNG.pas.net.server.shutdown_exception import direct_shutdown_exception
 from dNG.pas.plugins.hooks import direct_hooks
-from dNG.pas.pythonback import *
 
 class direct_request(direct_handler):
 #
@@ -154,8 +153,8 @@ Write a message to the socket.
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -request.write_message(message)- (#echo(__LINE__)#)")
 		var_return = True
 
-		message = direct_str(message)
-		bytes_unwritten = len(direct_bytes(message))
+		message = direct_binary.str(message)
+		bytes_unwritten = len(direct_binary.utf8_bytes(message))
 
 		try:
 		#

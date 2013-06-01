@@ -26,9 +26,9 @@ NOTE_END //n"""
 from os import path
 import json, re, socket, time
 
+from dNG.pas.data.binary import direct_binary
 from dNG.pas.data.settings import direct_settings
 from dNG.pas.module.named_loader import direct_named_loader
-from dNG.pas.pythonback import *
 
 class direct_client(object):
 #
@@ -65,7 +65,7 @@ happened.
 		"""
 Socket instance
 		"""
-		self.timeout = int(direct_settings.get("pas_server_socket_data_timeout", 30))
+		self.timeout = int(direct_settings.get("pas_server_socket_data_timeout", 0))
 		"""
 Request timeout value
 		"""
@@ -104,7 +104,7 @@ Request timeout value
 			listener_port = int(re_result.group(2))
 		#
 
-		listener_host = direct_str(listener_host)
+		listener_host = direct_binary.str(listener_host)
 
 		if ((listener_mode == socket.AF_INET) or (listener_mode == socket.AF_INET6)):
 		#
@@ -120,6 +120,7 @@ Request timeout value
 		self.socket = socket.socket(listener_mode, socket.SOCK_STREAM)
 		self.socket.settimeout(self.timeout)
 		self.socket.connect(listener_data)
+		if (self.timeout < 1): self.timeout = int(direct_settings.get("pas_global_socket_data_timeout", 30))
 
 		self.connected = True
 	#
@@ -165,7 +166,7 @@ Returns data read from the socket.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -client.get_message()- (#echo(__LINE__)#)")
-		var_return = direct_bytes("")
+		var_return = direct_binary.BYTES_TYPE()
 
 		data = None
 		data_size = 0
@@ -201,7 +202,7 @@ Returns data read from the socket.
 					else:
 					#
 						var_return += data
-						data_size = len(direct_bytes(var_return))
+						data_size = len(direct_binary.utf8_bytes(var_return))
 					#
 				#
 				else: data = None
@@ -209,7 +210,7 @@ Returns data read from the socket.
 			except: var_return = ""
 		#
 
-		if (var_return != None and ((not force_size) or message_size <= data_size)): return direct_str(var_return)
+		if (var_return != None and ((not force_size) or message_size <= data_size)): return direct_binary.str(var_return)
 		else: raise OSError("get_message({0:d})".format(message_size), 5)
 	#
 
@@ -225,7 +226,7 @@ Requests the IPC aware application to call the given hook.
 :since:  v0.1.00
 		"""
 
-		hook = direct_str(hook)
+		hook = direct_binary.str(hook)
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -client.request({0}, *args)- (#echo(__LINE__)#)".format(hook))
 		var_return = None
@@ -260,8 +261,8 @@ Sends a message to the helper application.
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -client.write_message(message)- (#echo(__LINE__)#)")
 		var_return = True
 
-		message = direct_bytes(message)
-		message = (direct_bytes("{0:d}\n".format(len(message))) + message)
+		message = direct_binary.utf8_bytes(message)
+		message = (direct_binary.utf8_bytes("{0:d}\n".format(len(message))) + message)
 
 		if (len(message) > 0):
 		#
