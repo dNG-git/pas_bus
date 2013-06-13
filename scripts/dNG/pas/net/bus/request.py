@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.bus.request
+dNG.pas.net.bus.Request
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,19 +25,18 @@ NOTE_END //n"""
 
 import json
 
-from dNG.pas.data.binary import direct_binary
-from dNG.pas.net.server.handler import direct_handler
-from dNG.pas.plugins.hooks import direct_hooks
+from dNG.pas.data.binary import Binary
+from dNG.pas.net.server.handler import Handler
+from dNG.pas.plugins.hooks import Hooks
 
-class direct_request(direct_handler):
+class Request(Handler):
 #
 	"""
-"direct_request" is an opened conversation with a running IPC aware
-application.
+"Request" is an opened conversation with a running IPC aware application.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
-:package:    pas_complete
+:package:    pas
 :subpackage: bus
 :since;      v0.1.00
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
@@ -47,12 +46,12 @@ application.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_request)
+Constructor __init__(Request)
 
 @since v0.1.00
 		"""
 
-		direct_handler.__init__(self)
+		Handler.__init__(self)
 	#
 
 	def get_message(self):
@@ -64,7 +63,7 @@ Read an expected message from the socket.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -request.get_message()- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.get_message()- (#echo(__LINE__)#)")
 
 		try:
 		#
@@ -103,7 +102,7 @@ Active conversation
 :since:  v1.0.0
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -request.thread_run()- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.thread_run()- (#echo(__LINE__)#)")
 		message = self.get_message()
 
 		while (len(message) > 0):
@@ -113,7 +112,7 @@ Active conversation
 				data = json.loads(message)
 				if (self.log_handler != None): self.log_handler.debug("pas.bus will call {0!s}".format(data['method']))
 
-				result = direct_hooks.call(data['method'], **data)
+				result = Hooks.call(data['method'], **data)
 
 				if (result != None):
 				#
@@ -133,7 +132,7 @@ Active conversation
 			#
 			except Exception as handled_exception:
 			#
-				if (self.log_handler != None): self.log_handler.error("#echo(__FILEPATH__)# -request.thread_run()- reporting: Error {0!r} occurred in message {1}".format(handled_exception, message))
+				if (self.log_handler != None): self.log_handler.error("#echo(__FILEPATH__)# -Request.thread_run()- reporting: Error {0!r} occurred in message {1}".format(handled_exception, message))
 				message = ""
 			#
 		#
@@ -150,11 +149,11 @@ Write a message to the socket.
 :since:  v1.0.0
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -request.write_message(message)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.write_message(message)- (#echo(__LINE__)#)")
 		var_return = True
 
-		message = direct_binary.str(message)
-		bytes_unwritten = len(direct_binary.utf8_bytes(message))
+		message = Binary.str(message)
+		bytes_unwritten = len(Binary.utf8_bytes(message))
 
 		try:
 		#

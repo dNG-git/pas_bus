@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.bus.server
+dNG.pas.net.bus.Server
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,16 +23,17 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-import re, socket
+import re
+import socket
 
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.net.server.dispatcher import direct_dispatcher
-from .request import direct_request
+from dNG.pas.data.settings import Settings
+from dNG.pas.net.server.dispatcher import Dispatcher
+from .request import Request
 
-class direct_server(direct_dispatcher):
+class Server(Dispatcher):
 #
 	"""
-"direct_server" is responsible to provide an IPC aware bus.
+"Server" is responsible to handle requests on the IPC aware bus.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -46,13 +47,13 @@ class direct_server(direct_dispatcher):
 	def __init__(self, app_config_prefix = "pas_bus"):
 	#
 		"""
-Constructor __init__(direct_server)
+Constructor __init__(Server)
 
 @since v0.1.00
 		"""
 
-		listener_address = direct_settings.get("{0}_listener_address".format(app_config_prefix))
-		listener_mode = direct_settings.get("{0}_listener_mode".format(app_config_prefix))
+		listener_address = Settings.get("{0}_listener_address".format(app_config_prefix))
+		listener_mode = Settings.get("{0}_listener_mode".format(app_config_prefix))
 
 		if (listener_mode == "ipv6"): listener_mode = socket.AF_INET6
 		elif (listener_mode == "ipv4"): listener_mode = socket.AF_INET
@@ -85,10 +86,10 @@ Constructor __init__(direct_server)
 			listener_port = int(re_result.group(2))
 		#
 
-		listener_socket = direct_dispatcher.prepare_socket(listener_mode, listener_host, listener_port)
+		listener_socket = Dispatcher.prepare_socket(listener_mode, listener_host, listener_port)
 
-		listener_max_actives = int(direct_settings.get("{0}_listener_actives_max".format(app_config_prefix), 100))
-		direct_dispatcher.__init__(self, listener_socket, direct_request, listener_max_actives)
+		listener_max_actives = int(Settings.get("{0}_listener_actives_max".format(app_config_prefix), 100))
+		Dispatcher.__init__(self, listener_socket, Request, listener_max_actives)
 	#
 #
 
