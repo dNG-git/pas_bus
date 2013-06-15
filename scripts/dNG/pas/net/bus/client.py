@@ -94,7 +94,7 @@ Request timeout value
 			listener_address = "localhost:8135"
 		#
 
-		re_result = re.search("^(.+?):(\d+)$", listener_address)
+		re_result = re.search("^(.+?):(\\d+)$", listener_address)
 
 		if (re_result == None):
 		#
