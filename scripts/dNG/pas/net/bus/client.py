@@ -136,8 +136,7 @@ Destructor __del__(Client)
 :since: v0.1.00
 		"""
 
-		if (self.connected): self.disconnect()
-		if (self.log_handler != None): self.log_handler.return_instance()
+		if (self.connected): Client.disconnect(self)
 	#
 
 	def disconnect(self):
