@@ -49,7 +49,7 @@ class Server(Dispatcher):
 		"""
 Constructor __init__(Server)
 
-@since v0.1.00
+:since: v0.1.00
 		"""
 
 		listener_address = Settings.get("{0}_listener_address".format(app_config_prefix))

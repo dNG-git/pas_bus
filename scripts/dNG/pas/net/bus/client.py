@@ -111,12 +111,12 @@ Request timeout value
 
 		if ((listener_mode == socket.AF_INET) or (listener_mode == socket.AF_INET6)):
 		#
-			if (self.log_handler != None): self.log_handler.debug("pas.bus client connects to '{0}:{1:d}'".format(listener_host, listener_port))
+			if (self.log_handler != None): self.log_handler.debug("pas.bus.Client connects to '{0}:{1:d}'".format(listener_host, listener_port))
 			listener_data = ( listener_host, listener_port )
 		#
 		elif (listener_mode == socket.AF_UNIX):
 		#
-			if (self.log_handler != None): self.log_handler.debug("pas.bus client connects to '{0}'".format(listener_host))
+			if (self.log_handler != None): self.log_handler.debug("pas.bus.Client connects to '{0}'".format(listener_host))
 			listener_data = path.normpath(listener_host)
 		#
 
@@ -168,7 +168,7 @@ Returns data read from the socket.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.get_message()- (#echo(__LINE__)#)")
-		var_return = Binary.BYTES_TYPE()
+		_return = Binary.BYTES_TYPE()
 
 		data = None
 		data_size = 0
@@ -194,25 +194,25 @@ Returns data read from the socket.
 
 							if (message_size > 256):
 							#
-								var_return = data[(newline_position + 1):]
+								_return = data[(newline_position + 1):]
 								message_size -= (255 - newline_position)
 								force_size = True
 							#
-							else: var_return = data[(newline_position + 1):(newline_position + 1 + message_size)]
+							else: _return = data[(newline_position + 1):(newline_position + 1 + message_size)]
 						#
 					#
 					else:
 					#
-						var_return += data
-						data_size = len(Binary.utf8_bytes(var_return))
+						_return += data
+						data_size = len(Binary.utf8_bytes(_return))
 					#
 				#
 				else: data = None
 			#
-			except: var_return = ""
+			except: _return = ""
 		#
 
-		if (var_return != None and ((not force_size) or message_size <= data_size)): return Binary.str(var_return)
+		if (_return != None and ((not force_size) or message_size <= data_size)): return Binary.str(_return)
 		else: raise OSError("get_message({0:d})".format(message_size), 5)
 	#
 
@@ -231,7 +231,7 @@ Requests the IPC aware application to call the given hook.
 		hook = Binary.str(hook)
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.request({0}, *args)- (#echo(__LINE__)#)".format(hook))
-		var_return = None
+		_return = None
 
 		data = json.dumps({ "jsonrpc": "2.0", "method": hook, "params": args, "id": 1 })
 
@@ -242,11 +242,11 @@ Requests the IPC aware application to call the given hook.
 			if (len(data) > 0):
 			#
 				data = json.loads(data)
-				if (type(data) == dict and "result" in data): var_return = data['result']
+				if (type(data) == dict and "result" in data): _return = data['result']
 			#
 		#
 
-		return var_return
+		return _return
 	#
 
 	def write_message(self, message):
@@ -261,7 +261,7 @@ Sends a message to the helper application.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.write_message(message)- (#echo(__LINE__)#)")
-		var_return = True
+		_return = True
 
 		message = Binary.utf8_bytes(message)
 		message = (Binary.utf8_bytes("{0:d}\n".format(len(message))) + message)
@@ -272,11 +272,11 @@ Sends a message to the helper application.
 			except Exception as handled_exception:
 			#
 				if (self.log_handler != None): self.log_handler.error(handled_exception)
-				var_return = False
+				_return = False
 			#
 		#
 
-		return var_return
+		return _return
 	#
 #
 

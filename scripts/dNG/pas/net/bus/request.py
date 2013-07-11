@@ -43,17 +43,6 @@ class Request(Handler):
              Mozilla Public License, v. 2.0
 	"""
 
-	def __init__(self):
-	#
-		"""
-Constructor __init__(Request)
-
-@since v0.1.00
-		"""
-
-		Handler.__init__(self)
-	#
-
 	def get_message(self):
 	#
 		"""
@@ -69,7 +58,7 @@ Read an expected message from the socket.
 		#
 			message = self.get_data(256)
 			newline_position = message.find("\n")
-			var_return = ""
+			_return = ""
 
 			if (newline_position > 0):
 			#
@@ -77,32 +66,31 @@ Read an expected message from the socket.
 
 				if (message_size > 256):
 				#
-					var_return = message[(newline_position + 1):]
+					_return = message[(newline_position + 1):]
 					message_size -= (255 - newline_position)
-					var_return += self.get_data(message_size, True)
+					_return += self.get_data(message_size, True)
 				#
 				else:
 				#
-					var_return = message[(newline_position + 1):(newline_position + 1 + message_size)]
-					if (len(message) > (newline_position + 1 + message_size)): self.set_data(message[(newline_position + 1 + message_size):])
+					_return = message[(newline_position + 1):(newline_position + 1 + message_size)]
+					if (len(message) > (newline_position + 1 + message_size)): self._set_data(message[(newline_position + 1 + message_size):])
 				#
 			#
 		#
-		except EOFError: var_return = ""
+		except EOFError: _return = ""
 
-		return var_return
+		return _return
 	#
 
-	def thread_run(self):
+	def _thread_run(self):
 	#
 		"""
 Active conversation
 
-:access: protected
-:since:  v1.0.0
+:since: v1.0.0
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.thread_run()- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request._thread_run()- (#echo(__LINE__)#)")
 		message = self.get_message()
 
 		while (len(message) > 0):
@@ -110,20 +98,20 @@ Active conversation
 			try:
 			#
 				data = json.loads(message)
-				if (self.log_handler != None): self.log_handler.debug("pas.bus will call {0!s}".format(data['method']))
+				if (self.log_handler != None): self.log_handler.debug("pas.bus.Request will call {0!s}".format(data['method']))
 
 				result = Hooks.call(data['method'], **data)
 
 				if (result != None):
 				#
-					if (self.log_handler != None): self.log_handler.debug("pas.bus is returning an result")
+					if (self.log_handler != None): self.log_handler.debug("pas.bus.Request is returning an result")
 					result = json.dumps({ "jsonrpc": "2.0", "result": result, "id": 1 })
 				#
-				elif (self.log_handler != None): self.log_handler.debug("pas.bus got nothing to return")
+				elif (self.log_handler != None): self.log_handler.debug("pas.bus.Request got nothing to return")
 
 				if (data['method'] == "dNG.pas.status.stop"):
 				#
-					if (self.log_handler != None): self.log_handler.info("pas.bus received stop (shutdown) request")
+					if (self.log_handler != None): self.log_handler.info("pas.bus.Request received stop (shutdown) request")
 					message = ""
 					self.server.stop()
 				#
@@ -132,7 +120,7 @@ Active conversation
 			#
 			except Exception as handled_exception:
 			#
-				if (self.log_handler != None): self.log_handler.error("#echo(__FILEPATH__)# -Request.thread_run()- reporting: Error {0!r} occurred in message {1}".format(handled_exception, message))
+				if (self.log_handler != None): self.log_handler.error("#echo(__FILEPATH__)# -Request._thread_run()- reporting: Error {0!r} occurred in message {1}".format(handled_exception, message))
 				message = ""
 			#
 		#
@@ -150,7 +138,7 @@ Write a message to the socket.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.write_message(message)- (#echo(__LINE__)#)")
-		var_return = True
+		_return = True
 
 		message = Binary.str(message)
 		bytes_unwritten = len(Binary.utf8_bytes(message))
@@ -160,9 +148,9 @@ Write a message to the socket.
 			message = "{0:d}\n{1}".format(bytes_unwritten, message)
 			self.write_data(message)
 		#
-		except: var_return = False
+		except: _return = False
 
-		return var_return
+		return _return
 	#
 #
 
