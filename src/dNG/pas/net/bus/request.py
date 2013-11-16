@@ -109,7 +109,7 @@ Active conversation
 				#
 				elif (self.log_handler != None): self.log_handler.debug("pas.bus.Request got nothing to return")
 
-				if (data['method'] == "dNG.pas.status.stop"):
+				if (data['method'] == "dNG.pas.Status.stop"):
 				#
 					if (self.log_handler != None): self.log_handler.info("pas.bus.Request received stop (shutdown) request")
 					message = ""
@@ -148,7 +148,7 @@ Write a message to the socket.
 			message = "{0:d}\n{1}".format(bytes_unwritten, message)
 			self.write_data(message)
 		#
-		except: _return = False
+		except Exception: _return = False
 
 		return _return
 	#

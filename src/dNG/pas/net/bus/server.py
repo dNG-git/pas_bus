@@ -67,13 +67,13 @@ Constructor __init__(Server)
 			#
 			elif (listener_address == None): listener_address = "localhost:8135"
 		#
-		except:
+		except AttributeError:
 		#
 			listener_mode = socket.AF_INET
 			listener_address = "localhost:8135"
 		#
 
-		re_result = re.search("^(.+?):(\\d+)$", listener_address)
+		re_result = re.search("^(.+):(\\d+)$", listener_address)
 
 		if (re_result == None):
 		#

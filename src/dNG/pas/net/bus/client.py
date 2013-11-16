@@ -88,13 +88,13 @@ Request timeout value
 			#
 			elif (listener_address == None): listener_address = "localhost:8135"
 		#
-		except:
+		except AttributeError:
 		#
 			listener_mode = socket.AF_INET
 			listener_address = "localhost:8135"
 		#
 
-		re_result = re.search("^(.+?):(\\d+)$", listener_address)
+		re_result = re.search("^(.+):(\\d+)$", listener_address)
 
 		if (re_result == None):
 		#
@@ -209,11 +209,11 @@ Returns data read from the socket.
 				#
 				else: data = None
 			#
-			except: _return = ""
+			except Exception: _return = ""
 		#
 
-		if (_return != None and ((not force_size) or message_size <= data_size)): return Binary.str(_return)
-		else: raise OSError("get_message({0:d})".format(message_size), 5)
+		if (_return == None or (force_size and data_size < message_size)): raise OSError("Received data size is smaller than the expected message size of {0:d} bytes".format(message_size))
+		return Binary.str(_return)
 	#
 
 	def request(self, hook, *args):
@@ -235,7 +235,7 @@ Requests the IPC aware application to call the given hook.
 
 		data = json.dumps({ "jsonrpc": "2.0", "method": hook, "params": args, "id": 1 })
 
-		if (self.write_message(data) and hook != "dNG.pas.status.stop"):
+		if (self.write_message(data) and hook != "dNG.pas.Status.stop"):
 		#
 			data = self.get_message()
 
