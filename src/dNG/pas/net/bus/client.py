@@ -32,6 +32,7 @@ import time
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
 from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.runtime.io_exception import IOException
 
 class Client(object):
 #
@@ -212,7 +213,7 @@ Returns data read from the socket.
 			except Exception: _return = ""
 		#
 
-		if (_return == None or (force_size and data_size < message_size)): raise OSError("Received data size is smaller than the expected message size of {0:d} bytes".format(message_size))
+		if (_return == None or (force_size and data_size < message_size)): raise IOException("Received data size is smaller than the expected message size of {0:d} bytes".format(message_size))
 		return Binary.str(_return)
 	#
 
