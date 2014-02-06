@@ -24,11 +24,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from os import path
-import json
 import re
 import socket
 import time
 
+from dNG.data.json_parser import JsonParser
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
 from dNG.pas.module.named_loader import NamedLoader
@@ -234,7 +234,9 @@ Requests the IPC aware application to call the given hook.
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.request({0}, *args)- (#echo(__LINE__)#)".format(hook))
 		_return = None
 
-		data = json.dumps({ "jsonrpc": "2.0", "method": hook, "params": args, "id": 1 })
+		json_parser = JsonParser()
+
+		data = json_parser.data2json({ "jsonrpc": "2.0", "method": hook, "params": args, "id": 1 })
 
 		if (self.write_message(data) and hook != "dNG.pas.Status.stop"):
 		#
@@ -242,7 +244,7 @@ Requests the IPC aware application to call the given hook.
 
 			if (len(data) > 0):
 			#
-				data = json.loads(data)
+				data = json_parser.json2data(data)
 				if (type(data) == dict and "result" in data): _return = data['result']
 			#
 		#

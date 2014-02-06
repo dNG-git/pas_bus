@@ -28,7 +28,7 @@ import socket
 
 from dNG.pas.data.settings import Settings
 from dNG.pas.net.server.dispatcher import Dispatcher
-from .request import Request
+from .connection import Connection
 
 class Server(Dispatcher):
 #
@@ -89,7 +89,7 @@ Constructor __init__(Server)
 		listener_socket = Dispatcher.prepare_socket(listener_mode, listener_host, listener_port)
 
 		listener_max_actives = int(Settings.get("{0}_listener_actives_max".format(app_config_prefix), 100))
-		Dispatcher.__init__(self, listener_socket, Request, listener_max_actives)
+		Dispatcher.__init__(self, listener_socket, Connection, listener_max_actives)
 	#
 #
 
