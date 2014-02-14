@@ -41,16 +41,22 @@ Bus response sends the result for one executed bus result.
              Mozilla Public License, v. 2.0
 	"""
 
-	def __init__(self):
+	def __init__(self, handler = None):
 	#
 		"""
 Constructor __init__(BusResponse)
+
+:param handler: IPC client handler
 
 :since: v0.1.01
 		"""
 
 		AbstractResponse.__init__(self)
 
+		self.handler = handler
+		"""
+IPC handler to send the result to.
+		"""
 		self.message = None
 		"""
 Result message to be send
@@ -69,7 +75,7 @@ Sends the prepared response.
 		bytes_unwritten = len(Binary.utf8_bytes(message))
 
 		message = "{0:d}\n{1}".format(bytes_unwritten, message)
-		self.write_data(message)
+		self.handler.write_data(message)
 	#
 
 	def set_result(self, result):

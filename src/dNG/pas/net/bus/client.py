@@ -168,6 +168,8 @@ Returns data read from the socket.
 :since: v0.1.00
 		"""
 
+		# pylint: disable=broad-except
+
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.get_message()- (#echo(__LINE__)#)")
 		_return = Binary.BYTES_TYPE()
 
@@ -262,6 +264,8 @@ Sends a message to the helper application.
 :return: (bool) True on success
 :since:  v0.1.00
 		"""
+
+		# pylint: disable=broad-except
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.write_message(message)- (#echo(__LINE__)#)")
 		_return = True

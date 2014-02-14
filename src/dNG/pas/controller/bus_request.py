@@ -57,7 +57,7 @@ Constructor __init__(BusRequest)
 
 		self.handler = handler
 		"""
-IPC handler to read the request from and send the result to.
+IPC handler to read the request from.
 		"""
 
 		if (self.handler != None):
@@ -74,6 +74,8 @@ Executes the incoming request.
 
 :since: v0.1.01
 		"""
+
+		# pylint: disable=broad-except
 
 		response = self._init_response()
 
@@ -108,6 +110,8 @@ Returns parameters for the request read from the IPC client handler.
 :since:  v0.1.01
 		"""
 
+		# pylint: disable=protected-access
+
 		_return = { }
 
 		data = self.handler.get_data(256)
@@ -127,7 +131,7 @@ Returns parameters for the request read from the IPC client handler.
 			else:
 			#
 				message = data[(newline_position + 1):(newline_position + 1 + data_size)]
-				if (len(data) > (newline_position + 1 + data_size)): self._set_data(data[(newline_position + 1 + data_size):])
+				if (len(data) > (newline_position + 1 + data_size)): self.handler._set_data(data[(newline_position + 1 + data_size):])
 			#
 		#
 

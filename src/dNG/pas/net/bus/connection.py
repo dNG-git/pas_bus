@@ -48,6 +48,8 @@ Active conversation
 :since: v1.0.0
 		"""
 
+		# pylint: disable=broad-except
+
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Connection._thread_run()- (#echo(__LINE__)#)")
 		request = BusRequest(self)
 
