@@ -24,6 +24,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from os import path
+from select import select
 import re
 import socket
 import time
@@ -137,7 +138,7 @@ Destructor __del__(Client)
 :since: v0.1.00
 		"""
 
-		if (self.connected): Client.disconnect(self)
+		if (self.connected): self.disconnect()
 	#
 
 	def disconnect(self):
@@ -165,28 +166,35 @@ Closes an active session.
 		"""
 Returns data read from the socket.
 
-:since: v0.1.00
+:param timeout: Alternative timeout value
+
+:return: (str) IPC message
+:since:  v0.1.00
 		"""
 
 		# pylint: disable=broad-except
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.get_message()- (#echo(__LINE__)#)")
-		_return = Binary.BYTES_TYPE()
+		_return = None
 
 		data = None
 		data_size = 0
 		force_size = False
 		message_size = 256
-		timeout_time = (time.time () + self.timeout)
+		timeout_time = time.time () + self.timeout
 
 		while ((data == None or (force_size and data_size < message_size)) and time.time() < timeout_time):
 		#
 			try:
 			#
+				select([ self.socket.fileno() ], [ ], [ ], self.timeout)
+
 				data = self.socket.recv(message_size)
 
 				if (len(data) > 0):
 				#
+					if (_return == None): _return = Binary.BYTES_TYPE()
+
 					if (data_size < 1):
 					#
 						newline_position = data.find("\n")
@@ -212,7 +220,7 @@ Returns data read from the socket.
 				#
 				else: data = None
 			#
-			except Exception: _return = ""
+			except Exception: data = ""
 		#
 
 		if (_return == None or (force_size and data_size < message_size)): raise IOException("Received data size is smaller than the expected message size of {0:d} bytes".format(message_size))
@@ -252,6 +260,19 @@ Requests the IPC aware application to call the given hook.
 		#
 
 		return _return
+	#
+
+	def set_timeout(self, timeout):
+	#
+		"""
+Sets the timeout for receiving a IPC message.
+
+:param timeout: Timeout in seconds
+
+:since: v0.1.01
+		"""
+
+		self.timeout = timeout
 	#
 
 	def write_message(self, message):
