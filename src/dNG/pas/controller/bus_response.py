@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.data.json_parser import JsonParser
+from dNG.data.json_resource import JsonResource
 from dNG.pas.data.binary import Binary
 from .abstract_response import AbstractResponse
 
@@ -88,7 +88,7 @@ Sets the encoded message to be send based on the result given.
 :since: v0.1.01
 		"""
 
-		self.message = JsonParser().data2json({ "jsonrpc": "2.0", "result": result, "id": 1 })
+		self.message = JsonResource().data_to_json({ "jsonrpc": "2.0", "result": result, "id": 1 })
 	#
 
 #

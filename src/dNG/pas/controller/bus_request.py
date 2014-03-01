@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.data.json_parser import JsonParser
+from dNG.data.json_resource import JsonResource
 from dNG.pas.plugins.hooks import Hooks
 from dNG.pas.runtime.io_exception import IOException
 from .abstract_request import AbstractRequest
@@ -137,7 +137,7 @@ Returns parameters for the request read from the IPC client handler.
 
 		if (message != ""):
 		#
-			parameters = JsonParser().json2data(message)
+			parameters = JsonResource().json_to_data(message)
 			if (parameters != None): _return = parameters
 		#
 

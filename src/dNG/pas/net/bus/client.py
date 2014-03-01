@@ -29,7 +29,7 @@ import re
 import socket
 import time
 
-from dNG.data.json_parser import JsonParser
+from dNG.data.json_resource import JsonResource
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
 from dNG.pas.module.named_loader import NamedLoader
@@ -244,9 +244,9 @@ Requests the IPC aware application to call the given hook.
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.request({0}, *args)- (#echo(__LINE__)#)".format(hook))
 		_return = None
 
-		json_parser = JsonParser()
+		json_resource = JsonResource()
 
-		data = json_parser.data2json({ "jsonrpc": "2.0", "method": hook, "params": args, "id": 1 })
+		data = json_resource.data_to_json({ "jsonrpc": "2.0", "method": hook, "params": args, "id": 1 })
 
 		if (self.write_message(data) and hook != "dNG.pas.Status.stop"):
 		#
@@ -254,7 +254,7 @@ Requests the IPC aware application to call the given hook.
 
 			if (len(data) > 0):
 			#
-				data = json_parser.json2data(data)
+				data = json_resource.json_to_data(data)
 				if (type(data) == dict and "result" in data): _return = data['result']
 			#
 		#
