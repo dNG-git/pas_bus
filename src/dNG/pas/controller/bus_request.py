@@ -26,6 +26,7 @@ NOTE_END //n"""
 from dNG.data.json_resource import JsonResource
 from dNG.pas.plugins.hooks import Hooks
 from dNG.pas.runtime.io_exception import IOException
+from dNG.pas.runtime.type_exception import TypeException
 from .abstract_request import AbstractRequest
 from .bus_response import BusResponse
 
@@ -75,15 +76,18 @@ Executes the incoming request.
 :since: v0.1.01
 		"""
 
-		# pylint: disable=broad-except
+		# pylint: disable=broad-except,star-args
 
 		response = self._init_response()
 
 		try:
 		#
 			method = self.get_parameter("method")
+			params = self.get_parameter("params", { })
+
 			if (self.log_handler != None): self.log_handler.debug("pas.bus.Request will call {0!s}".format(method))
-			result = Hooks.call(method, **self.get_parameters())
+			if (type(params) != dict): raise TypeException("Parameters given are not provided as dict")
+			result = Hooks.call(method, **params)
 
 			if (result != None):
 			#

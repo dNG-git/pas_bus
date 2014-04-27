@@ -70,7 +70,7 @@ happened.
 		"""
 Socket instance
 		"""
-		self.timeout = int(Settings.get("pas_server_socket_data_timeout", 0))
+		self.timeout = int(Settings.get("pas_global_server_socket_data_timeout", 0))
 		"""
 Request timeout value
 		"""
@@ -227,7 +227,7 @@ Returns data read from the socket.
 		return Binary.str(_return)
 	#
 
-	def request(self, hook, *args):
+	def request(self, hook, **kwargs):
 	#
 		"""
 Requests the IPC aware application to call the given hook.
@@ -241,12 +241,12 @@ Requests the IPC aware application to call the given hook.
 
 		hook = Binary.str(hook)
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.request({0}, *args)- (#echo(__LINE__)#)".format(hook))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.request({0}, **kwargs)- (#echo(__LINE__)#)".format(hook))
 		_return = None
 
 		json_resource = JsonResource()
 
-		data = json_resource.data_to_json({ "jsonrpc": "2.0", "method": hook, "params": args, "id": 1 })
+		data = json_resource.data_to_json({ "jsonrpc": "2.0", "method": hook, "params": kwargs, "id": 1 })
 
 		if (self.write_message(data) and hook != "dNG.pas.Status.stop"):
 		#
