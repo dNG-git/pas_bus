@@ -63,6 +63,62 @@ Result message to be send
 		"""
 	#
 
+	def handle_critical_error(self, message):
+	#
+		"""
+"handle_critical_error()" is called to send a critical error message.
+
+:param message: Message (will be translated if possible)
+
+:since: v0.1.01
+		"""
+
+		self.handle_error(message)
+	#
+
+	def handle_error(self, message):
+	#
+		"""
+"handle_error()" is called to send a error message.
+
+:param message: Message (will be translated if possible)
+
+:since: v0.1.01
+		"""
+
+		self.message = JsonResource().data_to_json({
+			"jsonrpc": "2.0",
+			"error": {
+				"code": -32500,
+				"message": message
+			},
+			"id": 1
+		})
+	#
+
+	def handle_exception(self, message, exception):
+	#
+		"""
+"handle_exception()" is called if an exception occurs and should be
+send.
+
+:param message: Message (will be translated if possible)
+:param exception: Original exception or formatted string (should be shown in
+                  dev mode)
+
+:since: v0.1.01
+		"""
+
+		self.message = JsonResource().data_to_json({
+			"jsonrpc": "2.0",
+			"error": {
+				"code": -32500,
+				"message": ("{0!r}".format(exception) if (message == None) else message)
+			},
+			"id": 1
+		})
+	#
+
 	def send(self):
 	#
 		"""

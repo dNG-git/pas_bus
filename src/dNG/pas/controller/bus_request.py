@@ -139,7 +139,8 @@ Returns parameters for the request read from the IPC client handler.
 			#
 		#
 
-		if (message != ""):
+		if (message == ""): _return['method'] = "dNG.pas.bus.Connection.close"
+		else:
 		#
 			parameters = JsonResource().json_to_data(message)
 			if (parameters != None): _return = parameters
@@ -172,6 +173,18 @@ Initializes the bus response instance.
 		if (self.log_handler != None): response.set_log_handler(self.log_handler)
 
 		return response
+	#
+
+	def is_close_requested(self):
+	#
+		"""
+Returns true if the client wants to close the connection.
+
+:return: (bool) True if close is received
+:since:  v0.1.01
+		"""
+
+		return (self.get_parameter("method") == "dNG.pas.bus.Connection.close")
 	#
 
 	def is_received(self):

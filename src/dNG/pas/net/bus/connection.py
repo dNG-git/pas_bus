@@ -53,7 +53,7 @@ Active conversation
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Connection._thread_run()- (#echo(__LINE__)#)")
 		request = BusRequest(self)
 
-		while (request.is_received()):
+		while (request.is_received() and (not request.is_close_requested())):
 		#
 			try:
 			#

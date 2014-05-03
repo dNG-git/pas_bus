@@ -49,6 +49,11 @@ IPC client for the application.
              Mozilla Public License, v. 2.0
 	"""
 
+	BINARY_NEWLINE = Binary.utf8_bytes("\n")
+	"""
+Newline character byte encoded
+	"""
+
 	def __init__(self, app_config_prefix = "pas_bus"):
 	#
 		"""
@@ -197,7 +202,7 @@ Returns data read from the socket.
 
 					if (data_size < 1):
 					#
-						newline_position = data.find("\n")
+						newline_position = data.find(Client.BINARY_NEWLINE)
 
 						if (newline_position > 0):
 						#
@@ -227,35 +232,40 @@ Returns data read from the socket.
 		return Binary.str(_return)
 	#
 
-	def request(self, hook, **kwargs):
+	def request(self, _hook, **kwargs):
 	#
 		"""
 Requests the IPC aware application to call the given hook.
 
-:param hook: Hook
+:param _hook: Hook
 :param args: Parameters
 
 :return: (mixed) Result data; None on error
 :since:  v0.1.00
 		"""
 
-		hook = Binary.str(hook)
+		_hook = Binary.str(_hook)
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.request({0}, **kwargs)- (#echo(__LINE__)#)".format(hook))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.request({0}, **kwargs)- (#echo(__LINE__)#)".format(_hook))
 		_return = None
 
 		json_resource = JsonResource()
 
-		data = json_resource.data_to_json({ "jsonrpc": "2.0", "method": hook, "params": kwargs, "id": 1 })
+		data = json_resource.data_to_json({ "jsonrpc": "2.0", "method": _hook, "params": kwargs, "id": 1 })
 
-		if (self.write_message(data) and hook != "dNG.pas.Status.stop"):
+		if (self.write_message(data) and _hook != "dNG.pas.Status.stop"):
 		#
 			data = self.get_message()
 
 			if (len(data) > 0):
 			#
 				data = json_resource.json_to_data(data)
-				if (type(data) == dict and "result" in data): _return = data['result']
+
+				if (type(data) == dict):
+				#
+					if ("error" in data): raise IOException(data['error']['message'])
+					elif ("result" in data): _return = data['result']
+				#
 			#
 		#
 
