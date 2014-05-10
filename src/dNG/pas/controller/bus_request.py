@@ -24,7 +24,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from dNG.data.json_resource import JsonResource
-from dNG.pas.plugins.hooks import Hooks
+from dNG.pas.plugins.hook import Hook
 from dNG.pas.runtime.io_exception import IOException
 from dNG.pas.runtime.type_exception import TypeException
 from .abstract_request import AbstractRequest
@@ -87,7 +87,7 @@ Executes the incoming request.
 
 			if (self.log_handler != None): self.log_handler.debug("pas.bus.Request will call {0!s}".format(method))
 			if (type(params) != dict): raise TypeException("Parameters given are not provided as dict")
-			result = Hooks.call(method, **params)
+			result = Hook.call(method, **params)
 
 			if (result != None):
 			#
