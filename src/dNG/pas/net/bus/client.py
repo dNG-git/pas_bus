@@ -216,12 +216,11 @@ Returns data read from the socket.
 							#
 							else: _return = data[(newline_position + 1):(newline_position + 1 + message_size)]
 						#
+						else: raise IOException("No message size value in stream detected")
 					#
-					else:
-					#
-						_return += data
-						data_size = len(Binary.utf8_bytes(_return))
-					#
+					else: _return += data
+
+					data_size = len(Binary.bytes(_return))
 				#
 				else: data = None
 			#
@@ -229,7 +228,7 @@ Returns data read from the socket.
 		#
 
 		if (_return == None or (force_size and data_size < message_size)): raise IOException("Received data size is smaller than the expected message size of {0:d} bytes".format(message_size))
-		return Binary.str(_return)
+		return Binary.raw_str(_return)
 	#
 
 	def request(self, _hook, **kwargs):

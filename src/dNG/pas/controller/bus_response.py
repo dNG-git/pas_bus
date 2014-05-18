@@ -127,8 +127,8 @@ Sends the prepared response.
 :since: v0.1.01
 		"""
 
-		message = Binary.str(self.message)
-		bytes_unwritten = len(Binary.utf8_bytes(message))
+		message = Binary.raw_str(self.message)
+		bytes_unwritten = len(Binary.bytes(message))
 
 		message = "{0:d}\n{1}".format(bytes_unwritten, message)
 		self.handler.write_data(message)
