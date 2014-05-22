@@ -86,14 +86,12 @@ Result message to be send
 :since: v0.1.01
 		"""
 
-		self.message = JsonResource().data_to_json({
-			"jsonrpc": "2.0",
-			"error": {
-				"code": -32500,
-				"message": message
-			},
-			"id": 1
-		})
+		self.message = JsonResource().data_to_json({ "jsonrpc": "2.0",
+		                                             "error": { "code": -32500,
+		                                                        "message": message
+		                                                      },
+		                                             "id": 1
+		                                           })
 	#
 
 	def handle_exception(self, message, exception):
@@ -109,14 +107,15 @@ send.
 :since: v0.1.01
 		"""
 
-		self.message = JsonResource().data_to_json({
-			"jsonrpc": "2.0",
-			"error": {
-				"code": -32500,
-				"message": ("{0!r}".format(exception) if (message == None) else message)
-			},
-			"id": 1
-		})
+		self.message = JsonResource().data_to_json({ "jsonrpc": "2.0",
+		                                             "error": { "code": -32500,
+		                                                        "message": ("{0!r}".format(exception)
+		                                                                    if (message == None) else
+		                                                                    message
+		                                                                   )
+		                                                      },
+		                                             "id": 1
+		                                           })
 	#
 
 	def send(self):
