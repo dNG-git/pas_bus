@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.net.bus.Client
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasBusVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from os import path
 from select import select
@@ -118,12 +113,12 @@ Request timeout value
 
 		if ((listener_mode == socket.AF_INET) or (listener_mode == socket.AF_INET6)):
 		#
-			if (self.log_handler != None): self.log_handler.debug("pas.bus.Client connects to '{0}:{1:d}'".format(listener_host, listener_port))
+			if (self.log_handler != None): self.log_handler.debug("{0!r} connects to '{1}:{2:d}'", self, listener_host, listener_port, context = "pas_bus")
 			listener_data = ( listener_host, listener_port )
 		#
 		elif (listener_mode == socket.AF_UNIX):
 		#
-			if (self.log_handler != None): self.log_handler.debug("pas.bus.Client connects to '{0}'".format(listener_host))
+			if (self.log_handler != None): self.log_handler.debug("{0!r} connects to '{1}'", self, listener_host, context = "pas_bus")
 			listener_data = path.normpath(listener_host)
 		#
 
@@ -154,19 +149,24 @@ Closes an active session.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.disconnect()- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.disconnect()- (#echo(__LINE__)#)", self, context = "pas_bus")
 
 		if (self.connected):
 		#
-			self.write_message("")
+			self._write_message("")
 			self.connected = False
 		#
 
-		self.socket.shutdown(socket.SHUT_RD)
-		self.socket.close()
+		if (self.socket != None):
+		#
+			self.socket.shutdown(socket.SHUT_RD)
+			self.socket.close()
+
+			self.socket = None
+		#
 	#
 
-	def get_message(self):
+	def _get_message(self):
 	#
 		"""
 Returns data read from the socket.
@@ -179,8 +179,8 @@ Returns data read from the socket.
 
 		# pylint: disable=broad-except
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.get_message()- (#echo(__LINE__)#)")
-		_return = None
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._get_message()- (#echo(__LINE__)#)", self, context = "pas_bus")
+		_return = Binary.BYTES_TYPE()
 
 		data = None
 		data_size = 0
@@ -198,8 +198,6 @@ Returns data read from the socket.
 
 				if (len(data) > 0):
 				#
-					if (_return == None): _return = Binary.BYTES_TYPE()
-
 					if (data_size < 1):
 					#
 						newline_position = data.find(Client.BINARY_NEWLINE)
@@ -227,7 +225,7 @@ Returns data read from the socket.
 			except Exception: data = ""
 		#
 
-		if (_return == None or (force_size and data_size < message_size)): raise IOException("Received data size is smaller than the expected message size of {0:d} bytes".format(message_size))
+		if (force_size and data_size < message_size): raise IOException("Received data size is smaller than the expected message size of {0:d} bytes".format(message_size))
 		return Binary.raw_str(_return)
 	#
 
@@ -245,25 +243,28 @@ Requests the IPC aware application to call the given hook.
 
 		_hook = Binary.str(_hook)
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.request({0}, **kwargs)- (#echo(__LINE__)#)".format(_hook))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.request({1})- (#echo(__LINE__)#)", self, _hook, context = "pas_bus")
 		_return = None
 
+		if (not self.connected): raise IOException("Connection already closed")
+
 		json_resource = JsonResource()
+		raw_request_data = json_resource.data_to_json({ "jsonrpc": "2.0", "method": _hook, "params": kwargs, "id": 1 })
 
-		data = json_resource.data_to_json({ "jsonrpc": "2.0", "method": _hook, "params": kwargs, "id": 1 })
-
-		if (self.write_message(data) and _hook != "dNG.pas.Status.stop"):
+		if (not self._write_message(raw_request_data)): raise IOException("Failed to transmit request")
+		elif (_hook == "dNG.pas.Status.stop"): self.disconnect()
+		else:
 		#
-			data = self.get_message()
+			raw_response_data = self._get_message()
 
-			if (len(data) > 0):
+			if (len(raw_response_data) > 0):
 			#
-				data = json_resource.json_to_data(data)
+				response = json_resource.json_to_data(raw_response_data)
 
-				if (type(data) == dict):
+				if (type(response) == dict):
 				#
-					if ("error" in data): raise IOException(data['error']['message'])
-					elif ("result" in data): _return = data['result']
+					if ("error" in response): raise IOException(response['error']['message'])
+					elif ("result" in response): _return = response['result']
 				#
 			#
 		#
@@ -284,7 +285,7 @@ Sets the timeout for receiving a IPC message.
 		self.timeout = timeout
 	#
 
-	def write_message(self, message):
+	def _write_message(self, message):
 	#
 		"""
 Sends a message to the helper application.
@@ -297,7 +298,7 @@ Sends a message to the helper application.
 
 		# pylint: disable=broad-except
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Client.write_message(message)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._write_message()- (#echo(__LINE__)#)", self, context = "pas_bus")
 		_return = True
 
 		message = Binary.utf8_bytes(message)
@@ -308,7 +309,7 @@ Sends a message to the helper application.
 			try: self.socket.sendall(message)
 			except Exception as handled_exception:
 			#
-				if (self.log_handler != None): self.log_handler.error(handled_exception)
+				if (self.log_handler != None): self.log_handler.error(handled_exception, "pas_bus")
 				_return = False
 			#
 		#

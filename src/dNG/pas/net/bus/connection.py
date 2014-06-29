@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.net.bus.Connection
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,10 +16,10 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasBusVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.pas.controller.bus_request import BusRequest
+from dNG.pas.data.binary import Binary
 from dNG.pas.net.server.handler import Handler
 
 class Connection(Handler):
@@ -40,6 +36,36 @@ class Connection(Handler):
              Mozilla Public License, v. 2.0
 	"""
 
+	def get_data(self, size, force_size = False):
+	#
+		"""
+Returns data read from the socket.
+
+:param size: Bytes to read
+:param force_size: True to wait for data until the given size has been
+                   received.
+
+:return: (bytes) Data received
+:since:  v0.1.00
+		"""
+
+		return Binary.str(Handler.get_data(self, size, force_size))
+	#
+
+	def _set_data(self, data):
+	#
+		"""
+Sets data returned next time "get_data()" is called. It is placed in front of
+the data buffer.
+
+:param data: Data to be buffered
+
+:since: v0.1.00
+		"""
+
+		Handler._set_data(self, Binary.utf8_bytes(data))
+	#
+
 	def _thread_run(self):
 	#
 		"""
@@ -50,7 +76,7 @@ Active conversation
 
 		# pylint: disable=broad-except
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Connection._thread_run()- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._thread_run()- (#echo(__LINE__)#)", self, context = "pas_bus")
 		request = BusRequest(self)
 
 		while (request.is_received() and (not request.is_close_requested())):
@@ -62,7 +88,7 @@ Active conversation
 			#
 			except Exception as handled_exception:
 			#
-				if (self.log_handler != None): self.log_handler.error("#echo(__FILEPATH__)# -Connection._thread_run()- reporting: Error {0!r} occurred".format(handled_exception))
+				if (self.log_handler != None): self.log_handler.error("#echo(__FILEPATH__)# -Connection._thread_run()- reporting: Error {1!r} occurred", self, handled_exception, context = "pas_bus")
 				request = BusRequest()
 			#
 		#

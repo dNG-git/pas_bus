@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.controller.BusRequest
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasBusVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.data.json_resource import JsonResource
 from dNG.pas.plugins.hook import Hook
@@ -78,31 +73,28 @@ Executes the incoming request.
 
 		# pylint: disable=broad-except,star-args
 
+		method = self.get_parameter("method")
 		response = self._init_response()
 
 		try:
 		#
-			method = self.get_parameter("method")
 			params = self.get_parameter("params", { })
 
-			if (self.log_handler != None): self.log_handler.debug("pas.bus.Request will call {0!s}".format(method))
+			if (self.log_handler != None): self.log_handler.debug("{0!r} will call {1!s}", self, method, context = "pas_bus")
 			if (type(params) != dict): raise TypeException("Parameters given are not provided as dict")
 			result = Hook.call(method, **params)
 
-			if (result != None):
-			#
-				if (self.log_handler != None): self.log_handler.debug("pas.bus.Request is returning an result")
-				response.set_result(result)
-			#
-			elif (self.log_handler != None): self.log_handler.debug("pas.bus.Request got nothing to return")
+			if (self.log_handler != None): self.log_handler.debug("{0!r} {1}", self, ("got nothing to return" if (result == None) else "is returning an result"), context = "pas_bus")
+
+			response.set_result(result)
 		#
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_bus")
 			response.handle_exception(None, handled_exception)
 		#
 
-		self._respond(response)
+		if (method != "dNG.pas.Status.stop"): self._respond(response)
 	#
 
 	def _get_parameters(self):

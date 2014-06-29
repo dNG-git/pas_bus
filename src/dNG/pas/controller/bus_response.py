@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.controller.BusResponse
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasBusVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.data.json_resource import JsonResource
 from dNG.pas.data.binary import Binary
@@ -143,6 +138,7 @@ Sets the encoded message to be send based on the result given.
 :since: v0.1.01
 		"""
 
+		if (result == None): result = { }
 		self.message = JsonResource().data_to_json({ "jsonrpc": "2.0", "result": result, "id": 1 })
 	#
 
