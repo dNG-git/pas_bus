@@ -75,6 +75,8 @@ Socket instance
 Request timeout value
 		"""
 
+		if (self.timeout < 1): self.timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
+
 		listener_address = Settings.get("{0}_listener_address".format(app_config_prefix))
 		listener_mode = Settings.get("{0}_listener_mode".format(app_config_prefix))
 
@@ -125,7 +127,6 @@ Request timeout value
 		self.socket = socket.socket(listener_mode, socket.SOCK_STREAM)
 		self.socket.settimeout(self.timeout)
 		self.socket.connect(listener_data)
-		if (self.timeout < 1): self.timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
 
 		self.connected = True
 	#
