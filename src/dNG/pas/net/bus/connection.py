@@ -71,7 +71,7 @@ the data buffer.
 		"""
 Active conversation
 
-:since: v1.0.0
+:since: v0.1.00
 		"""
 
 		# pylint: disable=broad-except
