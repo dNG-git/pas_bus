@@ -38,9 +38,7 @@ from os import path
 
 with TemporaryDirectory(dir = ".") as build_directory:
 #
-	parameters = { "install_data_plain_copy_extensions": "json",
-	               "pasPluginsVersion": get_version()
-	             }
+	parameters = { "pasBusVersion": get_version() }
 
 	InstallData.set_build_target_path(build_directory)
 	InstallData.set_build_target_parameters(parameters)
