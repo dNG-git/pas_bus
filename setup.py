@@ -23,10 +23,10 @@ def get_version():
 Returns the version currently in development.
 
 :return: (str) Version string
-:since:  v0.1.02
+:since:  v0.1.01
 	"""
 
-	return "v0.1.01"
+	return "v0.1.02"
 #
 
 from dNG.distutils.command.build_py import BuildPy

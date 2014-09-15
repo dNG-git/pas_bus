@@ -20,9 +20,9 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from os import path
 from select import select
+from time import time
 import re
 import socket
-import time
 
 from dNG.data.json_resource import JsonResource
 from dNG.pas.data.binary import Binary
@@ -70,11 +70,12 @@ happened.
 		"""
 Socket instance
 		"""
-		self.timeout = int(Settings.get("pas_global_server_socket_data_timeout", 0))
+		self.timeout = int(Settings.get("pas_bus_socket_data_timeout", 0))
 		"""
 Request timeout value
 		"""
 
+		if (self.timeout < 1): self.timeout = int(Settings.get("pas_global_client_socket_data_timeout", 0))
 		if (self.timeout < 1): self.timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
 
 		listener_address = Settings.get("{0}_listener_address".format(app_config_prefix))
@@ -187,43 +188,38 @@ Returns data read from the socket.
 		data_size = 0
 		force_size = False
 		message_size = 256
-		timeout_time = time.time () + self.timeout
+		timeout_time = time() + self.timeout
 
-		while ((data == None or (force_size and data_size < message_size)) and time.time() < timeout_time):
+		while ((data == None or (force_size and data_size < message_size)) and time() < timeout_time):
 		#
-			try:
+			select([ self.socket.fileno() ], [ ], [ ], self.timeout)
+			data = self.socket.recv(message_size)
+
+			if (len(data) > 0):
 			#
-				select([ self.socket.fileno() ], [ ], [ ], self.timeout)
-
-				data = self.socket.recv(message_size)
-
-				if (len(data) > 0):
+				if (data_size < 1):
 				#
-					if (data_size < 1):
+					newline_position = data.find(Client.BINARY_NEWLINE)
+
+					if (newline_position > 0):
 					#
-						newline_position = data.find(Client.BINARY_NEWLINE)
+						message_size = int(data[:newline_position])
 
-						if (newline_position > 0):
+						if (message_size > 256):
 						#
-							message_size = int(data[:newline_position])
-
-							if (message_size > 256):
-							#
-								_return = data[(newline_position + 1):]
-								message_size -= (255 - newline_position)
-								force_size = True
-							#
-							else: _return = data[(newline_position + 1):(newline_position + 1 + message_size)]
+							_return = data[(newline_position + 1):]
+							message_size -= (255 - newline_position)
+							force_size = True
 						#
-						else: raise IOException("No message size value in stream detected")
+						else: _return = data[(newline_position + 1):(newline_position + 1 + message_size)]
 					#
-					else: _return += data
-
-					data_size = len(Binary.bytes(_return))
+					else: raise IOException("No message size value in stream detected")
 				#
-				else: data = None
+				else: _return += data
+
+				data_size = len(Binary.bytes(_return))
 			#
-			except Exception: data = ""
+			else: data = None
 		#
 
 		if (force_size and data_size < message_size): raise IOException("Received data size is smaller than the expected message size of {0:d} bytes".format(message_size))
