@@ -55,12 +55,12 @@ Constructor __init__(Server)
 
 		try:
 		#
-			if (listener_mode == None or listener_mode == "unixsocket"):
+			if (listener_mode is None or listener_mode == "unixsocket"):
 			#
 				listener_mode = socket.AF_UNIX
-				if (listener_address == None): listener_address = "/tmp/dNG.pas.socket"
+				if (listener_address is None): listener_address = "/tmp/dNG.pas.socket"
 			#
-			elif (listener_address == None): listener_address = "localhost:8135"
+			elif (listener_address is None): listener_address = "localhost:8135"
 		#
 		except AttributeError:
 		#
@@ -70,7 +70,7 @@ Constructor __init__(Server)
 
 		re_result = re.search("^(.+):(\\d+)$", listener_address)
 
-		if (re_result == None):
+		if (re_result is None):
 		#
 			listener_host = listener_address
 			listener_port = None

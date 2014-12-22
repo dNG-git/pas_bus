@@ -105,7 +105,7 @@ send.
 		self.message = JsonResource().data_to_json({ "jsonrpc": "2.0",
 		                                             "error": { "code": -32500,
 		                                                        "message": ("{0!r}".format(exception)
-		                                                                    if (message == None) else
+		                                                                    if (message is None) else
 		                                                                    message
 		                                                                   )
 		                                                      },
@@ -138,7 +138,7 @@ Sets the encoded message to be send based on the result given.
 :since: v0.1.01
 		"""
 
-		if (result == None): result = { }
+		if (result is None): result = { }
 		self.message = JsonResource().data_to_json({ "jsonrpc": "2.0", "result": result, "id": 1 })
 	#
 

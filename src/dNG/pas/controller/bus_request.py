@@ -56,7 +56,7 @@ Constructor __init__(BusRequest)
 IPC handler to read the request from.
 		"""
 
-		if (self.handler != None):
+		if (self.handler is not None):
 		#
 			self.parameters = self._get_parameters()
 			self.init()
@@ -80,17 +80,17 @@ Executes the incoming request.
 		#
 			params = self.get_parameter("params", { })
 
-			if (self.log_handler != None): self.log_handler.debug("{0!r} will call {1!s}", self, method, context = "pas_bus")
+			if (self.log_handler is not None): self.log_handler.debug("{0!r} will call {1!s}", self, method, context = "pas_bus")
 			if (type(params) != dict): raise TypeException("Parameters given are not provided as dict")
 			result = Hook.call(method, **params)
 
-			if (self.log_handler != None): self.log_handler.debug("{0!r} {1}", self, ("got nothing to return" if (result == None) else "is returning an result"), context = "pas_bus")
+			if (self.log_handler is not None): self.log_handler.debug("{0!r} {1}", self, ("got nothing to return" if (result is None) else "is returning an result"), context = "pas_bus")
 
 			response.set_result(result)
 		#
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_bus")
+			if (self.log_handler is not None): self.log_handler.error(handled_exception, context = "pas_bus")
 			response.handle_exception(None, handled_exception)
 		#
 
@@ -135,7 +135,7 @@ Returns parameters for the request read from the IPC client handler.
 		else:
 		#
 			parameters = JsonResource().json_to_data(message)
-			if (parameters != None): _return = parameters
+			if (parameters is not None): _return = parameters
 		#
 
 		return _return
@@ -162,7 +162,7 @@ Initializes the bus response instance.
 		"""
 
 		response = BusResponse(self.handler)
-		if (self.log_handler != None): response.set_log_handler(self.log_handler)
+		if (self.log_handler is not None): response.set_log_handler(self.log_handler)
 
 		return response
 	#
@@ -188,7 +188,7 @@ Returns true if a valid IPC request has been received.
 :since:  v0.1.01
 		"""
 
-		return (self.get_parameter("method") != None)
+		return (self.get_parameter("method") is not None)
 	#
 #
 

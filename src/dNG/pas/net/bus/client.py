@@ -86,12 +86,12 @@ Request timeout value
 
 		try:
 		#
-			if (listener_mode == None or listener_mode == "unixsocket"):
+			if (listener_mode is None or listener_mode == "unixsocket"):
 			#
 				listener_mode = socket.AF_UNIX
-				if (listener_address == None): listener_address = "/tmp/dNG.pas.socket"
+				if (listener_address is None): listener_address = "/tmp/dNG.pas.socket"
 			#
-			elif (listener_address == None): listener_address = "localhost:8135"
+			elif (listener_address is None): listener_address = "localhost:8135"
 		#
 		except AttributeError:
 		#
@@ -101,7 +101,7 @@ Request timeout value
 
 		re_result = re.search("^(.+):(\\d+)$", listener_address)
 
-		if (re_result == None):
+		if (re_result is None):
 		#
 			listener_host = listener_address
 			listener_port = None
@@ -116,12 +116,12 @@ Request timeout value
 
 		if ((listener_mode == socket.AF_INET) or (listener_mode == socket.AF_INET6)):
 		#
-			if (self.log_handler != None): self.log_handler.debug("{0!r} connects to '{1}:{2:d}'", self, listener_host, listener_port, context = "pas_bus")
+			if (self.log_handler is not None): self.log_handler.debug("{0!r} connects to '{1}:{2:d}'", self, listener_host, listener_port, context = "pas_bus")
 			listener_data = ( listener_host, listener_port )
 		#
 		elif (listener_mode == socket.AF_UNIX):
 		#
-			if (self.log_handler != None): self.log_handler.debug("{0!r} connects to '{1}'", self, listener_host, context = "pas_bus")
+			if (self.log_handler is not None): self.log_handler.debug("{0!r} connects to '{1}'", self, listener_host, context = "pas_bus")
 			listener_data = path.normpath(listener_host)
 		#
 
@@ -151,7 +151,7 @@ Closes an active session.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.disconnect()- (#echo(__LINE__)#)", self, context = "pas_bus")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.disconnect()- (#echo(__LINE__)#)", self, context = "pas_bus")
 
 		if (self.connected):
 		#
@@ -159,7 +159,7 @@ Closes an active session.
 			self.connected = False
 		#
 
-		if (self.socket != None):
+		if (self.socket is not None):
 		#
 			self.socket.shutdown(socket.SHUT_RD)
 			self.socket.close()
@@ -181,7 +181,7 @@ Returns data read from the socket.
 
 		# pylint: disable=broad-except
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._get_message()- (#echo(__LINE__)#)", self, context = "pas_bus")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._get_message()- (#echo(__LINE__)#)", self, context = "pas_bus")
 		_return = Binary.BYTES_TYPE()
 
 		data = None
@@ -190,7 +190,7 @@ Returns data read from the socket.
 		message_size = 256
 		timeout_time = time() + self.timeout
 
-		while ((data == None or (force_size and data_size < message_size)) and time() < timeout_time):
+		while ((data is None or (force_size and data_size < message_size)) and time() < timeout_time):
 		#
 			select([ self.socket.fileno() ], [ ], [ ], self.timeout)
 			data = self.socket.recv(message_size)
@@ -240,7 +240,7 @@ Requests the IPC aware application to call the given hook.
 
 		_hook = Binary.str(_hook)
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.request({1})- (#echo(__LINE__)#)", self, _hook, context = "pas_bus")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.request({1})- (#echo(__LINE__)#)", self, _hook, context = "pas_bus")
 		_return = None
 
 		if (not self.connected): raise IOException("Connection already closed")
@@ -295,7 +295,7 @@ Sends a message to the helper application.
 
 		# pylint: disable=broad-except
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._write_message()- (#echo(__LINE__)#)", self, context = "pas_bus")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._write_message()- (#echo(__LINE__)#)", self, context = "pas_bus")
 		_return = True
 
 		message = Binary.utf8_bytes(message)
@@ -306,7 +306,7 @@ Sends a message to the helper application.
 			try: self.socket.sendall(message)
 			except Exception as handled_exception:
 			#
-				if (self.log_handler != None): self.log_handler.error(handled_exception, "pas_bus")
+				if (self.log_handler is not None): self.log_handler.error(handled_exception, "pas_bus")
 				_return = False
 			#
 		#
