@@ -81,7 +81,7 @@ Executes the incoming request.
 			params = self.get_parameter("params", { })
 
 			if (self.log_handler is not None): self.log_handler.debug("{0!r} will call {1!s}", self, method, context = "pas_bus")
-			if (type(params) != dict): raise TypeException("Parameters given are not provided as dict")
+			if (not isinstance(params, dict)): raise TypeException("Parameters given are not provided as dict")
 			result = Hook.call(method, **params)
 
 			if (self.log_handler is not None): self.log_handler.debug("{0!r} {1}", self, ("got nothing to return" if (result is None) else "is returning an result"), context = "pas_bus")

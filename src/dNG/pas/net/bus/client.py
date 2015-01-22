@@ -258,7 +258,7 @@ Requests the IPC aware application to call the given hook.
 			#
 				response = json_resource.json_to_data(raw_response_data)
 
-				if (type(response) == dict):
+				if (type(response) is dict):
 				#
 					if ("error" in response): raise IOException(response['error']['message'])
 					elif ("result" in response): _return = response['result']
