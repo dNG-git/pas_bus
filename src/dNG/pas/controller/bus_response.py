@@ -18,8 +18,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.data.json_resource import JsonResource
-from dNG.pas.data.binary import Binary
+from dNG.pas.data.dbus.message import Message
 from .abstract_response import AbstractResponse
 
 class BusResponse(AbstractResponse):
@@ -36,7 +35,7 @@ Bus response sends the result for one executed bus result.
              Mozilla Public License, v. 2.0
 	"""
 
-	def __init__(self, handler = None):
+	def __init__(self, connection):
 	#
 		"""
 Constructor __init__(BusResponse)
@@ -48,11 +47,11 @@ Constructor __init__(BusResponse)
 
 		AbstractResponse.__init__(self)
 
-		self.handler = handler
+		self.connection = connection
 		"""
-IPC handler to send the result to.
+IPC connection to send the result to.
 		"""
-		self.message = None
+		self.message = Message()
 		"""
 Result message to be send
 		"""
@@ -81,12 +80,9 @@ Result message to be send
 :since: v0.1.01
 		"""
 
-		self.message = JsonResource().data_to_json({ "jsonrpc": "2.0",
-		                                             "error": { "code": -32500,
-		                                                        "message": message
-		                                                      },
-		                                             "id": 1
-		                                           })
+		self.message.set_type(Message.TYPE_ERROR)
+		self.message.set_error_name("de.direct-netware.pas.Bus.Error")
+		self.message.set_body(message)
 	#
 
 	def handle_exception(self, message, exception):
@@ -102,15 +98,10 @@ send.
 :since: v0.1.01
 		"""
 
-		self.message = JsonResource().data_to_json({ "jsonrpc": "2.0",
-		                                             "error": { "code": -32500,
-		                                                        "message": ("{0!r}".format(exception)
-		                                                                    if (message is None) else
-		                                                                    message
-		                                                                   )
-		                                                      },
-		                                             "id": 1
-		                                           })
+		self.handle_error("{0!r}".format(exception)
+		                  if (message is None) else
+		                  message
+		                 )
 	#
 
 	def send(self):
@@ -121,11 +112,8 @@ Sends the prepared response.
 :since: v0.1.01
 		"""
 
-		message = Binary.raw_str(self.message)
-		bytes_unwritten = len(Binary.bytes(message))
-
-		message = "{0:d}\n{1}".format(bytes_unwritten, message)
-		self.handler.write_data(message)
+		self.message.set_reply_serial(1)
+		self.connection.write_data(self.message.marshal(2))
 	#
 
 	def set_result(self, result):
@@ -138,8 +126,8 @@ Sets the encoded message to be send based on the result given.
 :since: v0.1.01
 		"""
 
-		if (result is None): result = { }
-		self.message = JsonResource().data_to_json({ "jsonrpc": "2.0", "result": result, "id": 1 })
+		self.message.set_type(Message.TYPE_METHOD_REPLY)
+		if (result is not None): self.message.set_body(result)
 	#
 
 #

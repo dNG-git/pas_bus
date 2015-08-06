@@ -24,9 +24,10 @@ from time import time
 import re
 import socket
 
-from dNG.data.json_resource import JsonResource
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
+from dNG.pas.data.dbus.message import Message
+from dNG.pas.data.dbus.type_object import TypeObject
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.runtime.io_exception import IOException
 
@@ -42,11 +43,6 @@ IPC client for the application.
 :since:      v0.1.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
-
-	BINARY_NEWLINE = Binary.utf8_bytes("\n")
-	"""
-Newline character byte encoded
 	"""
 
 	def __init__(self, app_config_prefix = "pas_bus"):
@@ -155,7 +151,11 @@ Closes an active session.
 
 		if (self.connected):
 		#
-			self._write_message("")
+			message = self._get_message_call_template()
+			message.set_flags(Message.FLAG_NO_REPLY_EXPECTED)
+			message.set_object_member("close")
+
+			self._write_message(message)
 			self.connected = False
 		#
 
@@ -168,62 +168,71 @@ Closes an active session.
 		#
 	#
 
-	def _get_message(self):
+	def _get_message_call_template(self):
 	#
 		"""
-Returns data read from the socket.
+Returns a D-Bus message prepared to be used for IPC communication.
+
+:return: (object) Message instance
+:since:  v0.2.00
+		"""
+
+		_return = Message(Message.TYPE_METHOD_CALL)
+		_return.set_body_signature("a{sv}")
+		_return.set_object_interface("de.direct-netware.pas.Bus1")
+		_return.set_object_member("call")
+		_return.set_object_path("/de/direct-netware/pas/Bus")
+		_return.set_serial(1)
+
+		return _return
+	#
+
+	def _get_response_message(self):
+	#
+		"""
+Returns the IPC response message read from the socket.
 
 :param timeout: Alternative timeout value
 
-:return: (str) IPC message
-:since:  v0.1.00
+:return: (object) Message instance
+:since:  v0.2.00
 		"""
 
 		# pylint: disable=broad-except
 
 		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._get_message()- (#echo(__LINE__)#)", self, context = "pas_bus")
-		_return = Binary.BYTES_TYPE()
 
-		data = None
-		data_size = 0
-		force_size = False
-		message_size = 256
+		data_unread = 16
+		message_data = Binary.BYTES_TYPE()
+		message_size = 0
 		timeout_time = time() + self.timeout
 
-		while ((data is None or (force_size and data_size < message_size)) and time() < timeout_time):
+		while ((data_unread > 0 or message_size == 0) and time() < timeout_time):
 		#
 			select([ self.socket.fileno() ], [ ], [ ], self.timeout)
-			data = self.socket.recv(message_size)
+			data = self.socket.recv(data_unread)
 
 			if (len(data) > 0):
 			#
-				if (data_size < 1):
+				message_data += data
+
+				if (message_size < 1):
 				#
-					newline_position = data.find(Client.BINARY_NEWLINE)
-
-					if (newline_position > 0):
+					try:
 					#
-						message_size = int(data[:newline_position])
-
-						if (message_size > 256):
-						#
-							_return = data[(newline_position + 1):]
-							message_size -= (255 - newline_position)
-							force_size = True
-						#
-						else: _return = data[(newline_position + 1):(newline_position + 1 + message_size)]
+						message_size = Message.get_marshaled_message_size(message_data)
+						data_unread = (message_size - len(message_data))
 					#
-					else: raise IOException("No message size value in stream detected")
+					except IOException: pass
 				#
-				else: _return += data
-
-				data_size = len(Binary.bytes(_return))
+				else: data_unread -= len(data)
 			#
-			else: data = None
 		#
 
-		if (force_size and data_size < message_size): raise IOException("Received data size is smaller than the expected message size of {0:d} bytes".format(message_size))
-		return Binary.raw_str(_return)
+		if (message_size == 0): raise IOException("Timeout occurred before message size was calculable")
+		elif (len(message_data) < message_size): raise IOException("Timeout occurred before expected message size of {0:d} bytes was received".format(message_size))
+
+		return Message.unmarshal(message_data)
 	#
 
 	def request(self, _hook, **kwargs):
@@ -245,25 +254,36 @@ Requests the IPC aware application to call the given hook.
 
 		if (not self.connected): raise IOException("Connection already closed")
 
-		json_resource = JsonResource()
-		raw_request_data = json_resource.data_to_json({ "jsonrpc": "2.0", "method": _hook, "params": kwargs, "id": 1 })
+		request_message = self._get_message_call_template()
+		if (_hook == "dNG.pas.Status.stop"): request_message.set_flags(Message.FLAG_NO_REPLY_EXPECTED)
 
-		if (not self._write_message(raw_request_data)): raise IOException("Failed to transmit request")
-		elif (_hook == "dNG.pas.Status.stop"): self.disconnect()
+		request_message_body = { "method": _hook }
+		if (len(kwargs) > 0): request_message_body['params'] = TypeObject("a{sv}", kwargs)
+
+		request_message.set_body(request_message_body)
+
+		if (not self._write_message(request_message)): raise IOException("Failed to transmit request")
+
+		if (_hook == "dNG.pas.Status.stop"): self.connected = False
 		else:
 		#
-			raw_response_data = self._get_message()
+			response_message = self._get_response_message()
 
-			if (len(raw_response_data) > 0):
-			#
-				response = json_resource.json_to_data(raw_response_data)
+			if (((not response_message.is_error()) and (not response_message.is_method_reply()))
+			    or response_message.get_reply_serial() != 1
+			    or response_message.get_serial() != 2
+			   ): raise IOException("IPC response received is invalid")
 
-				if (type(response) is dict):
-				#
-					if ("error" in response): raise IOException(response['error']['message'])
-					elif ("result" in response): _return = response['result']
-				#
+			if (response_message.is_error()):
 			#
+				response_body = response_message.get_body()
+
+				raise IOException(Binary.str(response_body)
+				                  if (type(response_body) == Binary.BYTES_TYPE) else
+				                  response_message.get_error_name()
+				                 )
+			#
+			else: _return = response_message.get_body()
 		#
 
 		return _return
@@ -298,17 +318,11 @@ Sends a message to the helper application.
 		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._write_message()- (#echo(__LINE__)#)", self, context = "pas_bus")
 		_return = True
 
-		message = Binary.utf8_bytes(message)
-		message = (Binary.utf8_bytes("{0:d}\n".format(len(message))) + message)
-
-		if (len(message) > 0):
+		try: self.socket.sendall(message.marshal())
+		except Exception as handled_exception:
 		#
-			try: self.socket.sendall(message)
-			except Exception as handled_exception:
-			#
-				if (self.log_handler is not None): self.log_handler.error(handled_exception, "pas_bus")
-				_return = False
-			#
+			if (self.log_handler is not None): self.log_handler.error(handled_exception, "pas_bus")
+			_return = False
 		#
 
 		return _return
