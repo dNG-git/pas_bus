@@ -20,6 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from dNG.pas.data.dbus.message import Message
 from dNG.pas.plugins.hook import Hook
+from dNG.pas.plugins.manager import Manager
 from dNG.pas.runtime.io_exception import IOException
 from dNG.pas.runtime.type_exception import TypeException
 from .abstract_request import AbstractRequest
@@ -86,7 +87,11 @@ Executes the incoming request.
 
 			if (self.log_handler is not None): self.log_handler.debug("{0!r} will call {1!s}", self, method, context = "pas_bus")
 			if (not isinstance(params, dict)): raise TypeException("Parameters given are not provided as dict")
-			result = Hook.call(method, **params)
+
+			result = (Manager.reload_plugins(**params)
+			          if (method == "dNG.pas.Plugins.reload") else
+			          Hook.call(method, **params)
+			         )
 
 			if (self.log_handler is not None): self.log_handler.debug("{0!r} {1}", self, ("got nothing to return" if (result is None) else "is returning an result"), context = "pas_bus")
 			if (response is not None): response.set_result(result)
