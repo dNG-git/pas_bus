@@ -49,10 +49,12 @@ with TemporaryDirectory(dir = ".") as build_directory:
 	      version = get_version(),
 	      description = "Python Application Services",
 	      long_description = """"pas_bus" provides an IPC mechanism often used in CLI applications.""",
-	      author = "direct Netware Group",
+	      author = "direct Netware Group et al.",
 	      author_email = "web@direct-netware.de",
 	      license = "MPL2",
 	      url = "https://www.direct-netware.de/redirect?pas;bus",
+
+	      platforms = [ "any" ],
 
 	      package_dir = { "": _build_path },
 	      packages = [ "dNG" ],
