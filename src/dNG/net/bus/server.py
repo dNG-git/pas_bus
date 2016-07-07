@@ -21,8 +21,9 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 import re
 import socket
 
-from dNG.pas.data.settings import Settings
-from dNG.pas.net.server.dispatcher import Dispatcher
+from dNG.data.settings import Settings
+from dNG.net.server.dispatcher import Dispatcher
+
 from .connection import Connection
 
 class Server(Dispatcher):
@@ -30,11 +31,11 @@ class Server(Dispatcher):
 	"""
 "Server" is responsible to handle requests on the IPC aware bus.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since:      v0.1.00
+:since:      v0.3.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -44,7 +45,7 @@ class Server(Dispatcher):
 		"""
 Constructor __init__(Server)
 
-:since: v0.1.00
+:since: v0.3.00
 		"""
 
 		listener_address = Settings.get("{0}_listener_address".format(app_config_prefix))

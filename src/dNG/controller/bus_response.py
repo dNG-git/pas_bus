@@ -18,7 +18,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.dbus.message import Message
+from dNG.data.dbus.message import Message
+
 from .abstract_response import AbstractResponse
 
 class BusResponse(AbstractResponse):
@@ -26,11 +27,11 @@ class BusResponse(AbstractResponse):
 	"""
 Bus response sends the result for one executed bus result.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since:      v0.1.01
+:since:      v0.3.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -42,7 +43,7 @@ Constructor __init__(BusResponse)
 
 :param handler: IPC client handler
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		AbstractResponse.__init__(self)
@@ -64,7 +65,7 @@ Result message to be send
 
 :param message: Message (will be translated if possible)
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		self.handle_error(message)
@@ -77,7 +78,7 @@ Result message to be send
 
 :param message: Message (will be translated if possible)
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		self.message.set_type(Message.TYPE_ERROR)
@@ -95,7 +96,7 @@ send.
 :param exception: Original exception or formatted string (should be shown in
                   dev mode)
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		self.handle_error("{0!r}".format(exception)
@@ -109,7 +110,7 @@ send.
 		"""
 Sends the prepared response.
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		self.message.set_reply_serial(1)
@@ -123,7 +124,7 @@ Sets the encoded message to be send based on the result given.
 
 :param result: Result data
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		self.message.set_type(Message.TYPE_METHOD_REPLY)

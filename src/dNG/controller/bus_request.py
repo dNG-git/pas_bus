@@ -18,11 +18,12 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.dbus.message import Message
-from dNG.pas.plugins.hook import Hook
-from dNG.pas.plugins.manager import Manager
-from dNG.pas.runtime.io_exception import IOException
-from dNG.pas.runtime.type_exception import TypeException
+from dNG.data.dbus.message import Message
+from dNG.plugins.hook import Hook
+from dNG.plugins.manager import Manager
+from dNG.runtime.io_exception import IOException
+from dNG.runtime.type_exception import TypeException
+
 from .abstract_request import AbstractRequest
 from .bus_response import BusResponse
 
@@ -31,11 +32,11 @@ class BusRequest(AbstractRequest):
 	"""
 "BusRequest" implements an IPC request.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since:      v0.1.01
+:since:      v0.3.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -47,7 +48,7 @@ Constructor __init__(BusRequest)
 
 :param connection: IPC connection
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		AbstractRequest.__init__(self)
@@ -73,7 +74,7 @@ Raw IPC request message data
 		"""
 Executes the incoming request.
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		# pylint: disable=broad-except,star-args
@@ -110,7 +111,7 @@ Executes the incoming request.
 		"""
 Do preparations for request handling.
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		self.message = Message.unmarshal(self.message_data)
@@ -133,7 +134,7 @@ Do preparations for request handling.
 Initializes the bus response instance.
 
 :return: (object) Response object
-:since:  v0.1.01
+:since:  v0.3.00
 		"""
 
 		_return = None
@@ -153,7 +154,7 @@ Initializes the bus response instance.
 Returns true if the client wants to close the connection.
 
 :return: (bool) True if close is received
-:since:  v0.1.01
+:since:  v0.3.00
 		"""
 
 		return (self.message.get_object_member() == "close")

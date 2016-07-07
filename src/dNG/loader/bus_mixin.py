@@ -27,11 +27,11 @@ class BusMixin(object):
 	"""
 The "BusMixin" adds typical methods for an IPC aware loader.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since:      v0.1.01
+:since:      v0.3.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -41,7 +41,7 @@ The "BusMixin" adds typical methods for an IPC aware loader.
 		"""
 Constructor __init__(BusMixin)
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		self.time_started = None
@@ -59,7 +59,7 @@ Returns the OS process ID.
 :param last_return: The return value from the last hook called.
 
 :return: (int) OS process ID; -1 if unknown or unsupported
-:since:  v1.0.1
+:since:  v0.3.00
 		"""
 
 		pid = (os.getpid() if (hasattr(os, "getpid")) else -1)
@@ -77,7 +77,7 @@ Returns the time (timestamp) this service had been initialized.
 :param last_return: The return value from the last hook called.
 
 :return: (int) Unix timestamp
-:since:  v1.0.1
+:since:  v0.3.00
 		"""
 
 		return self.time_started
@@ -92,7 +92,7 @@ Returns the time in seconds since this service had been initialized.
 :param last_return: The return value from the last hook called.
 
 :return: (int) Uptime in seconds
-:since:  v0.1.01
+:since:  v0.3.00
 		"""
 
 		return int(floor(time() - self.time_started))
@@ -105,7 +105,7 @@ Sets the time (timestamp) this service had been initialized.
 
 :param timestamp: UNIX timestamp
 
-:since: v1.0.1
+:since: v0.3.00
 		"""
 
 		self.time_started = int(timestamp)

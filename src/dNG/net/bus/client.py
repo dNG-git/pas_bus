@@ -24,23 +24,23 @@ from time import time
 import re
 import socket
 
-from dNG.pas.data.binary import Binary
-from dNG.pas.data.settings import Settings
-from dNG.pas.data.dbus.message import Message
-from dNG.pas.data.dbus.type_object import TypeObject
-from dNG.pas.module.named_loader import NamedLoader
-from dNG.pas.runtime.io_exception import IOException
+from dNG.data.binary import Binary
+from dNG.data.settings import Settings
+from dNG.data.dbus.message import Message
+from dNG.data.dbus.type_object import TypeObject
+from dNG.module.named_loader import NamedLoader
+from dNG.runtime.io_exception import IOException
 
 class Client(object):
 #
 	"""
 IPC client for the application.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since:      v0.1.00
+:since:      v0.3.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -50,14 +50,14 @@ IPC client for the application.
 		"""
 Constructor __init__(Client)
 
-:since: v0.1.00
+:since: v0.3.00
 		"""
 
 		self.connected = False
 		"""
 Connection ready flag
 		"""
-		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
+		self.log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
 		"""
 The LogHandler is called whenever debug messages should be logged or errors
 happened.
@@ -133,7 +133,7 @@ Request timeout value
 		"""
 Destructor __del__(Client)
 
-:since: v0.1.00
+:since: v0.3.00
 		"""
 
 		if (self.connected): self.disconnect()
@@ -144,7 +144,7 @@ Destructor __del__(Client)
 		"""
 Closes an active session.
 
-:since: v0.1.00
+:since: v0.3.00
 		"""
 
 		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.disconnect()- (#echo(__LINE__)#)", self, context = "pas_bus")
@@ -174,7 +174,7 @@ Closes an active session.
 Returns a D-Bus message prepared to be used for IPC communication.
 
 :return: (object) Message instance
-:since:  v0.2.00
+:since:  v0.3.00
 		"""
 
 		_return = Message(Message.TYPE_METHOD_CALL)
@@ -195,7 +195,7 @@ Returns the IPC response message read from the socket.
 :param timeout: Alternative timeout value
 
 :return: (object) Message instance
-:since:  v0.2.00
+:since:  v0.3.00
 		"""
 
 		# pylint: disable=broad-except
@@ -244,7 +244,7 @@ Requests the IPC aware application to call the given hook.
 :param args: Parameters
 
 :return: (mixed) Result data; None on error
-:since:  v0.1.00
+:since:  v0.3.00
 		"""
 
 		_hook = Binary.str(_hook)
@@ -296,7 +296,7 @@ Sets the timeout for receiving a IPC message.
 
 :param timeout: Timeout in seconds
 
-:since: v0.1.01
+:since: v0.3.00
 		"""
 
 		self.timeout = timeout
@@ -310,7 +310,7 @@ Sends a message to the helper application.
 :param message: Message to be written
 
 :return: (bool) True on success
-:since:  v0.1.00
+:since:  v0.3.00
 		"""
 
 		# pylint: disable=broad-except

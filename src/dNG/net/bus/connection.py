@@ -18,22 +18,22 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.controller.bus_request import BusRequest
-from dNG.pas.data.binary import Binary
-from dNG.pas.data.dbus.message import Message
-from dNG.pas.net.server.handler import Handler
-from dNG.pas.runtime.io_exception import IOException
+from dNG.controller.bus_request import BusRequest
+from dNG.data.binary import Binary
+from dNG.data.dbus.message import Message
+from dNG.net.server.handler import Handler
+from dNG.runtime.io_exception import IOException
 
 class Connection(Handler):
 #
 	"""
 "Connection" is an opened conversation with a running IPC aware application.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since;      v0.1.01
+:since;      v0.3.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -43,7 +43,7 @@ class Connection(Handler):
 		"""
 Active conversation
 
-:since: v0.1.00
+:since: v0.3.00
 		"""
 
 		# pylint: disable=broad-except
