@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -27,8 +26,7 @@ from dNG.net.server.dispatcher import Dispatcher
 from .connection import Connection
 
 class Server(Dispatcher):
-#
-	"""
+    """
 "Server" is responsible to handle requests on the IPC aware bus.
 
 :author:     direct Netware Group et al.
@@ -38,55 +36,44 @@ class Server(Dispatcher):
 :since:      v0.3.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self, app_config_prefix = "pas_bus"):
-	#
-		"""
+    def __init__(self, app_config_prefix = "pas_bus"):
+        """
 Constructor __init__(Server)
 
 :since: v0.3.00
-		"""
+        """
 
-		listener_address = Settings.get("{0}_listener_address".format(app_config_prefix))
-		listener_mode = Settings.get("{0}_listener_mode".format(app_config_prefix))
+        listener_address = Settings.get("{0}_listener_address".format(app_config_prefix))
+        listener_mode = Settings.get("{0}_listener_mode".format(app_config_prefix))
 
-		if (listener_mode == "ipv6"): listener_mode = socket.AF_INET6
-		elif (listener_mode == "ipv4"): listener_mode = socket.AF_INET
+        if (listener_mode == "ipv6"): listener_mode = socket.AF_INET6
+        elif (listener_mode == "ipv4"): listener_mode = socket.AF_INET
 
-		try:
-		#
-			if (listener_mode is None or listener_mode == "unixsocket"):
-			#
-				listener_mode = socket.AF_UNIX
-				if (listener_address is None): listener_address = "/tmp/dNG.pas.socket"
-			#
-			elif (listener_address is None): listener_address = "localhost:8135"
-		#
-		except AttributeError:
-		#
-			listener_mode = socket.AF_INET
-			listener_address = "localhost:8135"
-		#
+        try:
+            if (listener_mode is None or listener_mode == "unixsocket"):
+                listener_mode = socket.AF_UNIX
+                if (listener_address is None): listener_address = "/tmp/dNG.pas.socket"
+            elif (listener_address is None): listener_address = "localhost:8135"
+        except AttributeError:
+            listener_mode = socket.AF_INET
+            listener_address = "localhost:8135"
+        #
 
-		re_result = re.search("^(.+):(\\d+)$", listener_address)
+        re_result = re.search("^(.+):(\\d+)$", listener_address)
 
-		if (re_result is None):
-		#
-			listener_host = listener_address
-			listener_port = None
-		#
-		else:
-		#
-			listener_host = re_result.group(1)
-			listener_port = int(re_result.group(2))
-		#
+        if (re_result is None):
+            listener_host = listener_address
+            listener_port = None
+        else:
+            listener_host = re_result.group(1)
+            listener_port = int(re_result.group(2))
+        #
 
-		listener_socket = Dispatcher.prepare_socket(listener_mode, listener_host, listener_port)
+        listener_socket = Dispatcher.prepare_socket(listener_mode, listener_host, listener_port)
 
-		listener_max_actives = int(Settings.get("{0}_listener_actives_max".format(app_config_prefix), 100))
-		Dispatcher.__init__(self, listener_socket, Connection, listener_max_actives)
-	#
+        listener_max_actives = int(Settings.get("{0}_listener_actives_max".format(app_config_prefix), 100))
+        Dispatcher.__init__(self, listener_socket, Connection, listener_max_actives)
+    #
 #
-
-##j## EOF

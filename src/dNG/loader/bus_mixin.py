@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -23,8 +22,7 @@ from time import time
 import os
 
 class BusMixin(object):
-#
-	"""
+    """
 The "BusMixin" adds typical methods for an IPC aware loader.
 
 :author:     direct Netware Group et al.
@@ -34,25 +32,23 @@ The "BusMixin" adds typical methods for an IPC aware loader.
 :since:      v0.3.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self):
-	#
-		"""
+    def __init__(self):
+        """
 Constructor __init__(BusMixin)
 
 :since: v0.3.00
-		"""
+        """
 
-		self.time_started = None
-		"""
+        self.time_started = None
+        """
 Timestamp of service initialisation
-		"""
-	#
+        """
+    #
 
-	def get_os_pid(self, params = None, last_return = None):
-	#
-		"""
+    def get_os_pid(self, params = None, last_return = None):
+        """
 Returns the OS process ID.
 
 :param params: Parameter specified
@@ -60,17 +56,16 @@ Returns the OS process ID.
 
 :return: (int) OS process ID; -1 if unknown or unsupported
 :since:  v0.3.00
-		"""
+        """
 
-		pid = (os.getpid() if (hasattr(os, "getpid")) else -1)
-		if (pid == 0): pid = -1
+        pid = (os.getpid() if (hasattr(os, "getpid")) else -1)
+        if (pid == 0): pid = -1
 
-		return pid
-	#
+        return pid
+    #
 
-	def get_time_started(self, params = None, last_return = None):
-	#
-		"""
+    def get_time_started(self, params = None, last_return = None):
+        """
 Returns the time (timestamp) this service had been initialized.
 
 :param params: Parameter specified
@@ -78,14 +73,13 @@ Returns the time (timestamp) this service had been initialized.
 
 :return: (int) Unix timestamp
 :since:  v0.3.00
-		"""
+        """
 
-		return self.time_started
-	#
+        return self.time_started
+    #
 
-	def get_uptime(self, params = None, last_return = None):
-	#
-		"""
+    def get_uptime(self, params = None, last_return = None):
+        """
 Returns the time in seconds since this service had been initialized.
 
 :param params: Parameter specified
@@ -93,23 +87,20 @@ Returns the time in seconds since this service had been initialized.
 
 :return: (int) Uptime in seconds
 :since:  v0.3.00
-		"""
+        """
 
-		return int(floor(time() - self.time_started))
-	#
+        return int(floor(time() - self.time_started))
+    #
 
-	def _set_time_started(self, timestamp):
-	#
-		"""
+    def _set_time_started(self, timestamp):
+        """
 Sets the time (timestamp) this service had been initialized.
 
 :param timestamp: UNIX timestamp
 
 :since: v0.3.00
-		"""
+        """
 
-		self.time_started = int(timestamp)
-	#
+        self.time_started = int(timestamp)
+    #
 #
-
-##j## EOF

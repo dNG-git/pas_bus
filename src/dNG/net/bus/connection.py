@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -25,8 +24,7 @@ from dNG.net.server.handler import Handler
 from dNG.runtime.io_exception import IOException
 
 class Connection(Handler):
-#
-	"""
+    """
 "Connection" is an opened conversation with a running IPC aware application.
 
 :author:     direct Netware Group et al.
@@ -36,51 +34,43 @@ class Connection(Handler):
 :since;      v0.3.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _thread_run(self):
-	#
-		"""
+    def _thread_run(self):
+        """
 Active conversation
 
 :since: v0.3.00
-		"""
+        """
 
-		# pylint: disable=broad-except
+        # pylint: disable=broad-except
 
-		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._thread_run()- (#echo(__LINE__)#)", self, context = "pas_bus")
+        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._thread_run()- (#echo(__LINE__)#)", self, context = "pas_bus")
 
-		data = Binary.BYTES_TYPE()
+        data = Binary.BYTES_TYPE()
 
-		while (self.socket is not None):
-		#
-			try:
-			#
-				data += self.get_data(16)
-				request_message_size = 0
+        while (self.socket is not None):
+            try:
+                data += self.get_data(16)
+                request_message_size = 0
 
-				try: request_message_size = Message.get_marshaled_message_size(data)
-				except IOException: pass
+                try: request_message_size = Message.get_marshaled_message_size(data)
+                except IOException: pass
 
-				if (request_message_size > 0 and len(data) >= request_message_size):
-				#
-					request_message_data = data[:request_message_size]
+                if (request_message_size > 0 and len(data) >= request_message_size):
+                    request_message_data = data[:request_message_size]
 
-					self._set_data(data[request_message_size:])
-					data = Binary.BYTES_TYPE()
+                    self._set_data(data[request_message_size:])
+                    data = Binary.BYTES_TYPE()
 
-					request = BusRequest(self, request_message_data)
+                    request = BusRequest(self, request_message_data)
 
-					if (request.is_close_requested()): self.stop()
-					else: request.execute()
-				#
-			#
-			except Exception as handled_exception:
-			#
-				if (self.log_handler is not None): self.log_handler.error("#echo(__FILEPATH__)# -Connection._thread_run()- reporting: Error {1!r} occurred", self, handled_exception, context = "pas_bus")
-			#
-		#
-	#
+                    if (request.is_close_requested()): self.stop()
+                    else: request.execute()
+                #
+            except Exception as handled_exception:
+                if (self.log_handler is not None): self.log_handler.error("#echo(__FILEPATH__)# -Connection._thread_run()- reporting: Error {1!r} occurred", self, handled_exception, context = "pas_bus")
+            #
+        #
+    #
 #
-
-##j## EOF
