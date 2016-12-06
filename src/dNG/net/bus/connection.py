@@ -17,6 +17,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+# pylint: disable=import-error, no-name-in-module
+
 from dNG.controller.bus_request import BusRequest
 from dNG.data.binary import Binary
 from dNG.data.dbus.message import Message

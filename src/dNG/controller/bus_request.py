@@ -17,6 +17,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+# pylint: disable=import-error, no-name-in-module
+
 from dNG.data.dbus.message import Message
 from dNG.plugins.hook import Hook
 from dNG.plugins.manager import Manager
@@ -73,7 +75,7 @@ Executes the incoming request.
 :since: v0.3.00
         """
 
-        # pylint: disable=broad-except,star-args
+        # pylint: disable=broad-except
 
         method = self.get_parameter("method")
         response = self._init_response()
