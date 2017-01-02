@@ -63,17 +63,21 @@ Constructor __init__(Server)
             listener_address = "localhost:8135"
         #
 
-        re_result = re.search("^(.+):(\\d+)$", listener_address)
+        listener_data = set()
 
-        if (re_result is None):
-            listener_host = listener_address
-            listener_port = None
-        else:
-            listener_host = re_result.group(1)
-            listener_port = int(re_result.group(2))
-        #
+        if (listener_mode in ( socket.AF_INET, socket.AF_INET6 )):
+            re_result = re.search("^(.+):(\\d+)$", listener_address)
 
-        listener_socket = Dispatcher.prepare_socket(listener_mode, listener_host, listener_port)
+            if (re_result is None):
+                listener_data.add(listener_address)
+                listener_data.add(None)
+            else:
+                listener_data.add(re_result.group(1))
+                listener_data.add(int(re_result.group(2)))
+            #
+        else: listener_data.add(listener_address)
+
+        listener_socket = Dispatcher.prepare_socket(listener_mode, *listener_data)
 
         listener_max_actives = int(Settings.get("{0}_listener_actives_max".format(app_config_prefix), 100))
         Dispatcher.__init__(self, listener_socket, Connection, listener_max_actives)
