@@ -31,7 +31,7 @@ Bus response sends the result for one executed bus result.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since:      v0.3.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -42,7 +42,7 @@ Constructor __init__(BusResponse)
 
 :param handler: IPC client handler
 
-:since: v0.3.00
+:since: v1.0.0
         """
 
         AbstractResponse.__init__(self)
@@ -55,6 +55,34 @@ IPC connection to send the result to.
         """
 Result message to be send
         """
+
+        self.supported_features['dict_result_data'] = True
+    #
+
+    @property
+    def result(self):
+        """
+Returns the encoded message to be send.
+
+:return: (str) Result data
+:since:  v1.0.0
+        """
+
+        return self.message.body
+    #
+
+    @result.setter
+    def result(self, result):
+        """
+Sets the encoded message to be send based on the result given.
+
+:param result: Result data
+
+:since: v1.0.0
+        """
+
+        self.message.type = Message.TYPE_METHOD_REPLY
+        if (result is not None): self.message.body = result
     #
 
     def handle_critical_error(self, message):
@@ -63,7 +91,7 @@ Result message to be send
 
 :param message: Message (will be translated if possible)
 
-:since: v0.3.00
+:since: v1.0.0
         """
 
         self.handle_error(message)
@@ -75,12 +103,11 @@ Result message to be send
 
 :param message: Message (will be translated if possible)
 
-:since: v0.3.00
+:since: v1.0.0
         """
 
-        self.message.set_type(Message.TYPE_ERROR)
-        self.message.set_error_name("de.direct-netware.pas.Bus.Error")
-        self.message.set_body(message)
+        self.message.error_name = "de.direct-netware.pas.Bus.Error"
+        self.message.body = message
     #
 
     def handle_exception(self, message, exception):
@@ -92,7 +119,7 @@ send.
 :param exception: Original exception or formatted string (should be shown in
                   dev mode)
 
-:since: v0.3.00
+:since: v1.0.0
         """
 
         self.handle_error("{0!r}".format(exception)
@@ -105,23 +132,10 @@ send.
         """
 Sends the prepared response.
 
-:since: v0.3.00
+:since: v1.0.0
         """
 
-        self.message.set_reply_serial(1)
+        self.message.reply_serial = 1
         self.connection.write_data(self.message.marshal(2))
-    #
-
-    def set_result(self, result):
-        """
-Sets the encoded message to be send based on the result given.
-
-:param result: Result data
-
-:since: v0.3.00
-        """
-
-        self.message.set_type(Message.TYPE_METHOD_REPLY)
-        if (result is not None): self.message.set_body(result)
     #
 #

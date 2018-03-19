@@ -29,7 +29,7 @@ The "BusMixin" adds typical methods for an IPC aware loader.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since:      v0.3.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -38,13 +38,41 @@ The "BusMixin" adds typical methods for an IPC aware loader.
         """
 Constructor __init__(BusMixin)
 
-:since: v0.3.00
+:since: v1.0.0
         """
 
-        self.time_started = None
+        self._time_started_value = None
         """
 Timestamp of service initialisation
         """
+    #
+
+    @property
+    def _time_started(self):
+        """
+Returns the time (timestamp) this service had been initialized.
+
+:param params: Parameter specified
+:param last_return: The return value from the last hook called.
+
+:return: (int) Unix timestamp
+:since:  v1.0.0
+        """
+
+        return self._time_started_value
+    #
+
+    @_time_started.setter
+    def _time_started(self, timestamp):
+        """
+Sets the time (timestamp) this service had been initialized.
+
+:param timestamp: UNIX timestamp
+
+:since: v1.0.0
+        """
+
+        self._time_started_value = int(timestamp)
     #
 
     def get_os_pid(self, params = None, last_return = None):
@@ -55,7 +83,7 @@ Returns the OS process ID.
 :param last_return: The return value from the last hook called.
 
 :return: (int) OS process ID; -1 if unknown or unsupported
-:since:  v0.3.00
+:since:  v1.0.0
         """
 
         pid = (os.getpid() if (hasattr(os, "getpid")) else -1)
@@ -72,10 +100,10 @@ Returns the time (timestamp) this service had been initialized.
 :param last_return: The return value from the last hook called.
 
 :return: (int) Unix timestamp
-:since:  v0.3.00
+:since:  v1.0.0
         """
 
-        return self.time_started
+        return self._time_started
     #
 
     def get_uptime(self, params = None, last_return = None):
@@ -86,21 +114,9 @@ Returns the time in seconds since this service had been initialized.
 :param last_return: The return value from the last hook called.
 
 :return: (int) Uptime in seconds
-:since:  v0.3.00
+:since:  v1.0.0
         """
 
-        return int(floor(time() - self.time_started))
-    #
-
-    def _set_time_started(self, timestamp):
-        """
-Sets the time (timestamp) this service had been initialized.
-
-:param timestamp: UNIX timestamp
-
-:since: v0.3.00
-        """
-
-        self.time_started = int(timestamp)
+        return int(floor(time() - self._time_started_value))
     #
 #
