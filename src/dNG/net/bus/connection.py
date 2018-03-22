@@ -33,7 +33,7 @@ class Connection(Handler):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since;      v0.3.00
+:since;      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -42,12 +42,12 @@ class Connection(Handler):
         """
 Active conversation
 
-:since: v0.3.00
+:since: v1.0.0
         """
 
         # pylint: disable=broad-except
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._thread_run()- (#echo(__LINE__)#)", self, context = "pas_bus")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}._thread_run()- (#echo(__LINE__)#)", self, context = "pas_bus")
 
         data = Binary.BYTES_TYPE()
 
@@ -67,11 +67,11 @@ Active conversation
 
                     request = BusRequest(self, request_message_data)
 
-                    if (request.is_close_requested()): self.stop()
+                    if (request.is_close_requested): self.stop()
                     else: request.execute()
                 #
             except Exception as handled_exception:
-                if (self.log_handler is not None): self.log_handler.error("#echo(__FILEPATH__)# -Connection._thread_run()- reporting: Error {1!r} occurred", self, handled_exception, context = "pas_bus")
+                if (self._log_handler is not None): self._log_handler.error("#echo(__FILEPATH__)# -Connection._thread_run()- reporting: Error {1!r} occurred", self, handled_exception, context = "pas_bus")
             #
         #
     #

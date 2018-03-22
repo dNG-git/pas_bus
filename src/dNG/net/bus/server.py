@@ -35,7 +35,7 @@ class Server(Dispatcher):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas
 :subpackage: bus
-:since:      v0.3.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -44,7 +44,7 @@ class Server(Dispatcher):
         """
 Constructor __init__(Server)
 
-:since: v0.3.00
+:since: v1.0.0
         """
 
         listener_address = Settings.get("{0}_listener_address".format(app_config_prefix))
