@@ -146,7 +146,7 @@ Initializes the bus response instance.
 
         _return = None
 
-        if (self.message.flags & Message.FLAG_NO_REPLY_EXPECTED != Message.FLAG_NO_REPLY_EXPECTED):
+        if (not (self.message.flags & Message.FLAG_NO_REPLY_EXPECTED)):
             _return = BusResponse(self.connection)
             if (self._log_handler is not None): _return.log_handler = self._log_handler
         #
