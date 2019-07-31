@@ -1,2 +1,8 @@
--e git+http://git.direct-netware.de/pas/dbus/#egg=pas-dbus
--e git+http://git.direct-netware.de/pas/server/#egg=pas-server
+git+https://git.direct-netware.de/pas/dbus/@v1.0.0#egg=pas-dbus
+git+https://git.direct-netware.de/pas/server/@v1.0.0#egg=pas-server
+
+git+https://git.direct-netware.de/dpt/builder_suite/@v1.0.0#egg=dpt-builder-suite
+git+https://git.direct-netware.de/dpt/module_loader/@v1.0.0#egg=dpt-module-loader
+git+https://git.direct-netware.de/dpt/plugins/@v1.0.0#egg=dpt-plugins
+git+https://git.direct-netware.de/dpt/runtime/@v1.0.1#egg=dpt-runtime
+git+https://git.direct-netware.de/dpt/settings/@v1.1.0#egg=dpt-settings

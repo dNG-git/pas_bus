@@ -17,15 +17,13 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-# pylint: disable=import-error, no-name-in-module
+from dpt_plugins import Hook
+from dpt_plugins import Manager
+from dpt_runtime.io_exception import IOException
+from dpt_runtime.type_exception import TypeException
+from pas_dbus.message import Message
+from pas_server.controller import AbstractRequest
 
-from dNG.data.dbus.message import Message
-from dNG.plugins.hook import Hook
-from dNG.plugins.manager import Manager
-from dNG.runtime.io_exception import IOException
-from dNG.runtime.type_exception import TypeException
-
-from .abstract_request import AbstractRequest
 from .bus_response import BusResponse
 
 class BusRequest(AbstractRequest):
@@ -41,31 +39,23 @@ class BusRequest(AbstractRequest):
              Mozilla Public License, v. 2.0
     """
 
-    def __init__(self, connection, message_data):
+    def __init__(self):
         """
 Constructor __init__(BusRequest)
-
-:param connection: IPC connection
 
 :since: v1.0.0
         """
 
         AbstractRequest.__init__(self)
 
-        self.connection = connection
+        self._connection = None
         """
 IPC connection to use
         """
-        self.message = None
+        self._message = None
         """
 IPC request message
         """
-        self.message_data = message_data
-        """
-Raw IPC request message data
-        """
-
-        self.init()
     #
 
     @property
@@ -80,6 +70,19 @@ Returns true if the client wants to close the connection.
         return (self.message.object_member == "close")
     #
 
+    @property
+    def message(self):
+        """
+Returns IPC request message.
+
+:return: (object) IPC request message
+:since:  v1.0.0
+        """
+
+        if (self._message is None): raise IOException("No IPC request message available")
+        return self._message
+    #
+
     def execute(self):
         """
 Executes the incoming request.
@@ -90,7 +93,7 @@ Executes the incoming request.
         # pylint: disable=broad-except
 
         method = self.get_parameter("method")
-        response = self._init_response()
+        response = self._new_response()
 
         try:
             params = self.get_parameter("params", { })
@@ -115,30 +118,32 @@ Executes the incoming request.
         if (response is not None): self._respond(response)
     #
 
-    def init(self):
+    def init(self, connection_or_request):
         """
-Do preparations for request handling.
+Initializes default values from the a connection or request instance.
+
+:param connection_or_request: Connection or request instance
 
 :since: v1.0.0
         """
 
-        self.message = Message.unmarshal(self.message_data)
-        self.message_data = None
+        self._connection = connection_or_request
+        self._message = Message.unmarshal(connection_or_request.request_message_data)
 
-        if (not self.message.is_method_call
-            or self.message.serial != 1
-            or self.message.object_interface != "de.direct-netware.pas.Bus1"
-            or self.message.object_path != "/de/direct-netware/pas/Bus"
-            or self.message.object_member not in ( "call", "close" )
+        if (not self._message.is_method_call
+            or self._message.serial != 1
+            or self._message.object_interface != "de.direct-netware.pas.Bus1"
+            or self._message.object_path != "/de/direct-netware/pas/Bus"
+            or self._message.object_member not in ( "call", "close" )
            ): raise IOException("IPC request received is invalid")
 
-        message_body = self.message.body
+        message_body = self._message.body
         if (type(message_body) is dict): self._parameters = message_body
     #
 
-    def _init_response(self):
+    def _new_response(self):
         """
-Initializes the bus response instance.
+Initializes the matching response instance.
 
 :return: (object) Response object
 :since:  v1.0.0
@@ -147,7 +152,7 @@ Initializes the bus response instance.
         _return = None
 
         if (not (self.message.flags & Message.FLAG_NO_REPLY_EXPECTED)):
-            _return = BusResponse(self.connection)
+            _return = BusResponse(self._connection)
             if (self._log_handler is not None): _return.log_handler = self._log_handler
         #
 

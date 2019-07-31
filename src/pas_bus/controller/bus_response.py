@@ -17,11 +17,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-# pylint: disable=import-error, no-name-in-module
-
-from dNG.data.dbus.message import Message
-
-from .abstract_response import AbstractResponse
+from pas_dbus.message import Message
+from pas_server.controller import AbstractResponse
 
 class BusResponse(AbstractResponse):
     """
@@ -40,7 +37,7 @@ Bus response sends the result for one executed bus result.
         """
 Constructor __init__(BusResponse)
 
-:param handler: IPC client handler
+:param connection: IPC client connection
 
 :since: v1.0.0
         """

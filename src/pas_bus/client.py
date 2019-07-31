@@ -17,20 +17,17 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-# pylint: disable=import-error, no-name-in-module
-
 from os import path
-from select import select
 from time import time
 import re
 import socket
 
-from dNG.data.binary import Binary
-from dNG.data.settings import Settings
-from dNG.data.dbus.message import Message
-from dNG.data.dbus.type_object import TypeObject
-from dNG.runtime.io_exception import IOException
-from dNG.runtime.named_loader import NamedLoader
+from dpt_module_loader import NamedClassLoader
+from dpt_runtime.binary import Binary
+from dpt_runtime.descriptor_selector import DescriptorSelector
+from dpt_runtime.io_exception import IOException
+from dpt_settings import Settings
+from pas_dbus import Message, TypeObject
 
 class Client(object):
     """
@@ -56,7 +53,7 @@ Constructor __init__(Client)
         """
 Connection ready flag
         """
-        self._log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
+        self._log_handler = NamedClassLoader.get_singleton("dpt_logging.LogHandler", False)
         """
 The LogHandler is called whenever debug messages should be logged or errors
 happened.
@@ -70,8 +67,8 @@ Socket instance
 Request timeout value
         """
 
-        if (self._timeout < 1): self._timeout = int(Settings.get("pas_global_client_socket_data_timeout", 0))
-        if (self._timeout < 1): self._timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
+        if (self._timeout < 1): self._timeout = int(Settings.get("global_client_socket_data_timeout", 0))
+        if (self._timeout < 1): self._timeout = int(Settings.get("global_socket_data_timeout", 30))
 
         listener_address = Settings.get("{0}_listener_address".format(app_config_prefix))
         listener_mode = Settings.get("{0}_listener_mode".format(app_config_prefix))
@@ -82,7 +79,7 @@ Request timeout value
         try:
             if (listener_mode is None or listener_mode == "unixsocket"):
                 listener_mode = socket.AF_UNIX
-                if (listener_address is None): listener_address = "/tmp/dNG.pas.socket"
+                if (listener_address is None): listener_address = path.join(Settings.get("path_data"), "pas-bus.socket")
             elif (listener_address is None): listener_address = "localhost:8135"
         except AttributeError:
             listener_mode = socket.AF_INET
@@ -183,9 +180,7 @@ Closes an active session.
         #
 
         if (self.socket is not None):
-            self.socket.shutdown(socket.SHUT_RD)
             self.socket.close()
-
             self.socket = None
         #
     #
@@ -225,10 +220,11 @@ Returns the IPC response message read from the socket.
         data_unread = 16
         message_data = Binary.BYTES_TYPE()
         message_size = 0
+        selector = DescriptorSelector([ self.socket.fileno() ])
         timeout_time = time() + self.timeout
 
         while ((data_unread > 0 or message_size == 0) and time() < timeout_time):
-            select([ self.socket.fileno() ], [ ], [ ], self.timeout)
+            if (len(selector.select(self.timeout, False)[0]) < 1): raise IOException("Failed to receive data")
             data = self.socket.recv(data_unread)
 
             if (len(data) > 0):
@@ -268,7 +264,7 @@ Requests the IPC aware application to call the given hook.
         if (not self.is_connected): raise IOException("Connection already closed")
 
         request_message = self._get_message_call_template()
-        if (_hook == "dNG.pas.Status.stop"): request_message.flags = Message.FLAG_NO_REPLY_EXPECTED
+        if (_hook == "pas.Application.stop"): request_message.flags = Message.FLAG_NO_REPLY_EXPECTED
 
         request_message_body = { "method": _hook }
         if (len(kwargs) > 0): request_message_body['params'] = TypeObject("a{sv}", kwargs)
@@ -277,7 +273,9 @@ Requests the IPC aware application to call the given hook.
 
         if (not self._write_message(request_message)): raise IOException("Failed to transmit request")
 
-        if (_hook == "dNG.pas.Status.stop"): self._connected = False
+        if (_hook == "pas.Application.stop"):
+            self._connected = False
+            self.disconnect()
         else:
             response_message = self._get_response_message()
 

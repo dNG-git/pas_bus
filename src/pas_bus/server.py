@@ -17,15 +17,14 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-# pylint: disable=import-error, no-name-in-module
-
+from os import path
 import re
 import socket
 
-from dNG.data.settings import Settings
-from dNG.net.server.dispatcher import Dispatcher
+from dpt_settings import Settings
+from pas_server import Dispatcher
 
-from .connection import Connection
+from .controller.bus_connection import BusConnection
 
 class Server(Dispatcher):
     """
@@ -56,7 +55,7 @@ Constructor __init__(Server)
         try:
             if (listener_mode is None or listener_mode == "unixsocket"):
                 listener_mode = socket.AF_UNIX
-                if (listener_address is None): listener_address = "/tmp/dNG.pas.socket"
+                if (listener_address is None): listener_address = path.join(Settings.get("path_data"), "pas-bus.socket")
             elif (listener_address is None): listener_address = "localhost:8135"
         except AttributeError:
             listener_mode = socket.AF_INET
@@ -80,6 +79,6 @@ Constructor __init__(Server)
         listener_socket = Dispatcher.prepare_socket(listener_mode, *listener_data)
 
         listener_max_actives = int(Settings.get("{0}_listener_actives_max".format(app_config_prefix), 100))
-        Dispatcher.__init__(self, listener_socket, Connection, listener_max_actives)
+        Dispatcher.__init__(self, listener_socket, BusConnection, listener_max_actives)
     #
 #

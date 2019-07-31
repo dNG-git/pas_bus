@@ -21,9 +21,9 @@ from math import floor
 from time import time
 import os
 
-class BusMixin(object):
+class CliMixin(object):
     """
-The "BusMixin" adds typical methods for an IPC aware loader.
+The "CliMixin" adds typical methods for an IPC aware CLI application.
 
 :author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -36,14 +36,14 @@ The "BusMixin" adds typical methods for an IPC aware loader.
 
     def __init__(self):
         """
-Constructor __init__(BusMixin)
+Constructor __init__(CliMixin)
 
 :since: v1.0.0
         """
 
         self._time_started_value = None
         """
-Timestamp of service initialisation
+Timestamp of service initialization
         """
     #
 
