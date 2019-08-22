@@ -102,7 +102,7 @@ Executes the incoming request.
             if (not isinstance(params, dict)): raise TypeException("Parameters given are not provided as dict")
 
             result = (Manager.reload_plugins(**params)
-                      if (method == "dNG.pas.Plugins.reload") else
+                      if (method == "pas.Plugins.reload") else
                       Hook.call(method, **params)
                      )
 
