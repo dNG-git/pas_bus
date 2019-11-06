@@ -39,6 +39,12 @@ class Server(Dispatcher):
              Mozilla Public License, v. 2.0
     """
 
+    __slots__ = [ ]
+    """
+python.org: __slots__ reserves space for the declared variables and prevents
+the automatic creation of __dict__ and __weakref__ for each instance.
+    """
+
     def __init__(self, app_config_prefix = "pas_bus"):
         """
 Constructor __init__(Server)

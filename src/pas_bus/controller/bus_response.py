@@ -33,6 +33,12 @@ Bus response sends the result for one executed bus result.
              Mozilla Public License, v. 2.0
     """
 
+    __slots__ = [ "_connection", "_message" ]
+    """
+python.org: __slots__ reserves space for the declared variables and prevents
+the automatic creation of __dict__ and __weakref__ for each instance.
+    """
+
     def __init__(self, connection):
         """
 Constructor __init__(BusResponse)
@@ -44,11 +50,11 @@ Constructor __init__(BusResponse)
 
         AbstractResponse.__init__(self)
 
-        self.connection = connection
+        self._connection = connection
         """
 IPC connection to send the result to.
         """
-        self.message = Message()
+        self._message = Message()
         """
 Result message to be send
         """
@@ -65,7 +71,7 @@ Returns the encoded message to be send.
 :since:  v1.0.0
         """
 
-        return self.message.body
+        return self._message.body
     #
 
     @result.setter
@@ -78,8 +84,8 @@ Sets the encoded message to be send based on the result given.
 :since: v1.0.0
         """
 
-        self.message.type = Message.TYPE_METHOD_REPLY
-        if (result is not None): self.message.body = result
+        self._message.type = Message.TYPE_METHOD_REPLY
+        if (result is not None): self._message.body = result
     #
 
     def handle_critical_error(self, message):
@@ -103,8 +109,8 @@ Sets the encoded message to be send based on the result given.
 :since: v1.0.0
         """
 
-        self.message.error_name = "de.direct-netware.pas.Bus.Error"
-        self.message.body = message
+        self._message.error_name = "de.direct-netware.pas.Bus.Error"
+        self._message.body = message
     #
 
     def handle_exception(self, message, exception):
@@ -132,7 +138,7 @@ Sends the prepared response.
 :since: v1.0.0
         """
 
-        self.message.reply_serial = 1
-        self.connection.write_data(self.message.marshal(2))
+        self._message.reply_serial = 1
+        self._connection.write_data(self._message.marshal(2))
     #
 #

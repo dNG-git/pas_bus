@@ -39,6 +39,12 @@ class BusRequest(AbstractRequest):
              Mozilla Public License, v. 2.0
     """
 
+    __slots__ = [ "_connection", "_message" ]
+    """
+python.org: __slots__ reserves space for the declared variables and prevents
+the automatic creation of __dict__ and __weakref__ for each instance.
+    """
+
     def __init__(self):
         """
 Constructor __init__(BusRequest)
@@ -153,7 +159,7 @@ Initializes the matching response instance.
 
         if (not (self.message.flags & Message.FLAG_NO_REPLY_EXPECTED)):
             _return = BusResponse(self._connection)
-            if (self._log_handler is not None): _return.log_handler = self._log_handler
+            _return.init(self)
         #
 
         return _return
